@@ -40,7 +40,7 @@ export default async function handler(req, res) {
         const MAX_PAGES = 50; // Deep scan
         const AXIOS_CONFIG = { timeout: 9000 };
 
-        log(`Starting Parallel Dual-Source Scan: Chain ${chain}, Address ${address}`);
+        log(`Starting Parallel Dual-Source Scan (v2/v3): Chain ${chain}, Address ${address}`);
 
         // Helper function to scan an endpoint
         const scanEndpoint = async (type) => {
@@ -49,8 +49,9 @@ export default async function handler(req, res) {
             let volume = 0;
             let txs = 0;
             let endpointLogs = [];
+            let useV2 = false; // Flag to switch to v2 if v3 fails
 
-            const eLog = (m) => endpointLogs.push(`[${type}] ${m}`);
+            const eLog = (m) => endpointLogs.push(`[${type}${useV2 ? '-v2' : ''}] ${m}`);
 
             while (hasMore && pageNumber < MAX_PAGES) {
                 if (Date.now() - START_TIME > TIME_LIMIT) {
@@ -63,13 +64,15 @@ export default async function handler(req, res) {
 
                 if (isSolana) {
                     // Solana only has transactions_v2
-                    if (type === 'transfers') return { volume: 0, txs: 0, logs: [] }; // Skip transfers for Solana
+                    if (type === 'transfers') return { volume: 0, txs: 0, logs: [] };
                     url = `${BASE_URL}/${chain}/address/${address}/transactions_v2/?key=${API_KEY}&page-number=${pageNumber}&page-size=100&quote-currency=USD`;
                 } else {
                     if (type === 'transfers') {
                         url = `${BASE_URL}/${chain}/address/${address}/transfers_v2/?key=${API_KEY}&page-number=${pageNumber}&page-size=100&quote-currency=USD`;
                     } else {
-                        url = `${BASE_URL}/${chain}/address/${address}/transactions_v3/?key=${API_KEY}&page-number=${pageNumber}&page-size=100&quote-currency=USD`;
+                        // Transactions: Try v3 first, fallback to v2
+                        let version = useV2 ? 'transactions_v2' : 'transactions_v3';
+                        url = `${BASE_URL}/${chain}/address/${address}/${version}/?key=${API_KEY}&page-number=${pageNumber}&page-size=100&quote-currency=USD`;
                     }
                 }
 
@@ -94,7 +97,7 @@ export default async function handler(req, res) {
                                 }
                                 return acc;
                             } else {
-                                // Transactions V3 - Native Value
+                                // Transactions V3/V2 - Native Value
                                 return acc + (item.value_quote || 0);
                             }
                         }
@@ -109,6 +112,13 @@ export default async function handler(req, res) {
                         pageNumber++;
                     }
                 } catch (err) {
+                    // Handle Fallback to V2 for Transactions
+                    if (type === 'transactions' && !useV2 && pageNumber === 0 && err.response && [400, 404, 501].includes(err.response.status)) {
+                        eLog(`V3 Failed (${err.response.status}). Switching to transactions_v2...`);
+                        useV2 = true;
+                        continue; // Retry loop with useV2 = true
+                    }
+
                     if (err.code === 'ECONNABORTED') {
                         eLog(`Timeout page ${pageNumber}`);
                     } else if (err.response && [400, 410, 501].includes(err.response.status)) {
@@ -134,9 +144,6 @@ export default async function handler(req, res) {
         debugLogs.push(...transactionsResult.logs);
 
         // Determine Final Volume (MAX Strategy)
-        // We take the higher of the two to avoid double counting but ensure we capture the most complete source.
-        // If transfers missed native, transactions will be higher.
-        // If transactions missed tokens, transfers will be higher.
         let finalVolume = Math.max(transfersResult.volume, transactionsResult.volume);
         let finalTxs = Math.max(transfersResult.txs, transactionsResult.txs);
 

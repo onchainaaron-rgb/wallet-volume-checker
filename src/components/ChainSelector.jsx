@@ -3,16 +3,16 @@ import './ChainSelector.css'
 
 const AVAILABLE_CHAINS = [
     { id: 'ethereum', name: 'Ethereum', icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=026' },
-    { id: 'base', name: 'Base', icon: 'https://raw.githubusercontent.com/base-org/brand-kit/master/logo/symbol/Base_Symbol_Blue.svg' },
+    { id: 'base', name: 'Base', icon: 'https://cryptologos.cc/logos/base-base-logo.svg?v=026' },
     { id: 'arbitrum', name: 'Arbitrum', icon: 'https://cryptologos.cc/logos/arbitrum-arb-logo.svg?v=026' },
     { id: 'optimism', name: 'Optimism', icon: 'https://cryptologos.cc/logos/optimism-ethereum-op-logo.svg?v=026' },
     { id: 'bsc', name: 'BSC', icon: 'https://cryptologos.cc/logos/bnb-bnb-logo.svg?v=026' },
     { id: 'polygon', name: 'Polygon', icon: 'https://cryptologos.cc/logos/polygon-matic-logo.svg?v=026' },
     { id: 'avalanche', name: 'Avalanche', icon: 'https://cryptologos.cc/logos/avalanche-avax-logo.svg?v=026' },
     { id: 'solana', name: 'Solana', icon: 'https://cryptologos.cc/logos/solana-sol-logo.svg?v=026' },
-    { id: 'zora', name: 'Zora', icon: 'https://zora.co/favicon.ico' }, // Fallback for Zora
-    { id: 'scroll', name: 'Scroll', icon: 'https://scroll.io/logo.png' }, // Fallback for Scroll
-    { id: 'blast', name: 'Blast', icon: 'https://docs.blast.io/img/logo.svg' },
+    { id: 'zora', name: 'Zora', icon: 'https://avatars.githubusercontent.com/u/60056322?s=200&v=4' },
+    { id: 'scroll', name: 'Scroll', icon: 'https://cryptologos.cc/logos/scroll-scroll-logo.svg?v=026' },
+    { id: 'blast', name: 'Blast', icon: 'https://avatars.githubusercontent.com/u/145060941?s=200&v=4' },
     { id: 'fantom', name: 'Fantom', icon: 'https://cryptologos.cc/logos/fantom-ftm-logo.svg?v=026' },
 ]
 

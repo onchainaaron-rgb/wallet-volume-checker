@@ -169,12 +169,14 @@ body {
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
-  padding: 1rem;
-  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  /* Match button radius */
   width: 100%;
   font-family: var(--font-mono);
   transition: all 0.2s ease;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  /* Match button font size */
 }
 
 .input-field:focus {
@@ -207,4 +209,10 @@ h6 {
 
 .mono {
   font-family: var(--font-mono);
+}
+
+.control-bar-item {
+  height: 48px !important;
+  display: flex;
+  align-items: center;
 }

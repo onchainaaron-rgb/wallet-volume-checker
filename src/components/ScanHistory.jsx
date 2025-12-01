@@ -102,22 +102,14 @@ export default function ScanHistory({ session }) {
                         placeholder="Search wallet address..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        style={{
-                            width: '100%',
-                            padding: '0.6rem 1rem',
-                            borderRadius: '8px',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            background: 'rgba(0, 0, 0, 0.2)',
-                            color: '#fff',
-                            fontSize: '0.9rem'
-                        }}
+                        className="input-field control-bar-item"
                     />
                 </div>
 
                 <select
                     value={sortOrder}
                     onChange={(e) => setSortOrder(e.target.value)}
-                    className="input-field"
+                    className="input-field control-bar-item"
                     style={{
                         width: 'auto',
                         cursor: 'pointer'
@@ -131,7 +123,7 @@ export default function ScanHistory({ session }) {
 
                 <button
                     onClick={fetchScans}
-                    className="btn-secondary"
+                    className="btn-primary control-bar-item"
                     disabled={loading}
                 >
                     <Layers size={16} />

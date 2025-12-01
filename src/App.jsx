@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react'
 import './App.css'
 import { Activity, Play, LogOut, User, History, Search, Trophy, List } from 'lucide-react'
@@ -64,7 +63,7 @@ function App() {
 
   // Debug State
   const [debugLogs, setDebugLogs] = useState([])
-  const [isDebugOpen, setIsDebugOpen] = useState(false)
+  // const [isDebugOpen, setIsDebugOpen] = useState(false) // Removed debug panel
 
   const addLog = (msg) => {
     const timestamp = new Date().toLocaleTimeString()
@@ -344,56 +343,8 @@ function App() {
           </div>
         )}
       </main>
-
-      {/* DEBUG PANEL TOGGLE */}
-      <div style={{ position: 'fixed', bottom: '1rem', right: '1rem', zIndex: 9999 }}>
-        <button
-          onClick={() => setIsDebugOpen(!isDebugOpen)}
-          style={{
-            background: '#333',
-            color: '#fff',
-            border: '1px solid #555',
-            padding: '0.5rem',
-            borderRadius: '4px',
-            fontSize: '0.8rem',
-            cursor: 'pointer'
-          }}
-        >
-          {isDebugOpen ? 'Hide Debug' : 'Show Debug'}
-        </button>
-      </div>
-
-      {/* DEBUG PANEL */}
-      {isDebugOpen && (
-        <div style={{
-          position: 'fixed',
-          bottom: '4rem',
-          right: '1rem',
-          width: '400px',
-          height: '300px',
-          background: 'rgba(0,0,0,0.9)',
-          border: '1px solid #555',
-          borderRadius: '8px',
-          padding: '1rem',
-          overflowY: 'auto',
-          zIndex: 9999,
-          fontFamily: 'monospace',
-          fontSize: '0.8rem',
-          color: '#0f0'
-        }}>
-          <h4 style={{ color: '#fff', marginTop: 0, borderBottom: '1px solid #333', paddingBottom: '0.5rem' }}>Debug Logs</h4>
-          {debugLogs.length === 0 ? (
-            <p style={{ color: '#666' }}>No logs yet...</p>
-          ) : (
-            debugLogs.map((log, i) => (
-              <div key={i} style={{ marginBottom: '0.25rem' }}>{log}</div>
-            ))
-          )}
-        </div>
-      )}
     </div>
   )
 }
 
 export default App
-

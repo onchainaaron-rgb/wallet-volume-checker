@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
-
 import { Wallet, Calendar, Layers } from 'lucide-react'
 import './ResultsTable.css' // Reuse the card styles
 
@@ -148,35 +147,76 @@ export default function ScanHistory({ session }) {
                 <div className="text-center p-4" style={{ color: '#888' }}>No scans match your search.</div>
             ) : (
                 <div className="cards-container">
-                    {filteredScans.map((scan) => (
-                        <div key={scan.id} className="result-card">
-                            <div className="card-header">
-                                <div className="wallet-info">
-                                    <Wallet size={16} className="text-secondary" />
-                                    <span className="mono">{scan.wallet_address}</span>
+                    {filteredScans.map((scan) => {
+                        const isWhale = scan.total_volume > 100000;
+                        const isDegen = scan.total_volume > 10000 && scan.total_volume <= 100000;
+
+                        return (
+                            <div key={scan.id} className="result-card" style={{
+                                background: 'linear-gradient(145deg, rgba(20,20,25,0.9) 0%, rgba(10,10,15,0.95) 100%)',
+                                border: isWhale ? '1px solid #00f0ff' : '1px solid rgba(255,255,255,0.1)',
+                                boxShadow: isWhale ? '0 0 20px rgba(0, 240, 255, 0.1)' : 'none'
+                            }}>
+                                <div className="card-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '1rem' }}>
+                                    <div className="wallet-info">
+                                        <Wallet size={16} className="text-secondary" />
+                                        <span className="mono" style={{ fontSize: '0.9rem', color: '#888' }}>{scan.wallet_address}</span>
+                                    </div>
+                                    <div className="scan-date" style={{ fontSize: '0.8rem', color: '#666', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <Calendar size={14} />
+                                        {new Date(scan.created_at).toLocaleDateString()}
+                                    </div>
                                 </div>
-                                <div className="scan-date" style={{ fontSize: '0.8rem', color: '#666', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <Calendar size={14} />
-                                    {new Date(scan.created_at).toLocaleDateString()}
+
+                                <div className="card-body" style={{ textAlign: 'center', padding: '1.5rem 0' }}>
+                                    <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px', color: '#666', marginBottom: '0.5rem' }}>
+                                        Verified Lifetime Volume
+                                    </div>
+                                    <div className="total-value text-gradient" style={{ fontSize: '2.5rem', fontWeight: '800', lineHeight: '1.1' }}>
+                                        {formatCurrency(scan.total_volume)}
+                                    </div>
+
+                                    <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '0.5rem' }}>
+                                        {isWhale && (
+                                            <span style={{
+                                                background: 'rgba(0, 240, 255, 0.1)',
+                                                color: '#00f0ff',
+                                                padding: '4px 12px',
+                                                borderRadius: '20px',
+                                                fontSize: '0.8rem',
+                                                fontWeight: 'bold',
+                                                border: '1px solid rgba(0, 240, 255, 0.2)'
+                                            }}>
+                                                🐋 WHALE STATUS
+                                            </span>
+                                        )}
+                                        {isDegen && (
+                                            <span style={{
+                                                background: 'rgba(243, 186, 47, 0.1)',
+                                                color: '#F3BA2F',
+                                                padding: '4px 12px',
+                                                borderRadius: '20px',
+                                                fontSize: '0.8rem',
+                                                fontWeight: 'bold',
+                                                border: '1px solid rgba(243, 186, 47, 0.2)'
+                                            }}>
+                                                🔥 ACTIVE DEGEN
+                                            </span>
+                                        )}
+                                        <span style={{
+                                            background: 'rgba(255,255,255,0.05)',
+                                            color: '#888',
+                                            padding: '4px 12px',
+                                            borderRadius: '20px',
+                                            fontSize: '0.8rem'
+                                        }}>
+                                            {Array.isArray(scan.chains) ? `${scan.chains.length} Chains` : 'Multi-Chain'}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-
-                            <div className="card-body">
-                                <div className="total-volume-section">
-                                    <span className="label">Total Volume</span>
-                                    <div className="total-value text-gradient">{formatCurrency(scan.total_volume)}</div>
-                                </div>
-
-                                <div className="chain-grid">
-                                    {Array.isArray(scan.chains) && scan.chains.map(chain => (
-                                        <div key={chain} className="chain-item">
-                                            <span className="chain-name">{chain}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
+                        )
+                    })}
                 </div>
             )}
         </div>

@@ -43,21 +43,17 @@ const ResultsTable = ({ results, isLoading, selectedChains }) => {
                                     <div className="total-value text-gradient">{formatCurrency(row.totalVolume)}</div>
                                 </div>
 
-                                {activeChains.length > 0 ? (
-                                    <div className="chain-grid">
-                                        {activeChains.map(chain => (
-                                            <div key={chain} className="chain-item">
+                                <div className="chain-grid">
+                                    {selectedChains.map(chain => {
+                                        const volume = row.chainVolumes[chain] || 0;
+                                        return (
+                                            <div key={chain} className="chain-item" style={{ opacity: volume > 0 ? 1 : 0.5 }}>
                                                 <span className="chain-name">{chain}</span>
-                                                <span className="chain-value">{formatCurrency(row.chainVolumes[chain])}</span>
+                                                <span className="chain-value">{formatCurrency(volume)}</span>
                                             </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="no-activity">
-                                        <Layers size={24} />
-                                        <span>No activity found on selected chains</span>
-                                    </div>
-                                )}
+                                        )
+                                    })}
+                                </div>
                             </div>
                         </div>
                     )

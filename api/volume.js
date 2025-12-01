@@ -36,7 +36,7 @@ export default async function handler(req, res) {
 
     try {
         const START_TIME = Date.now();
-        const TIME_LIMIT = 8500; // 8.5 seconds hard limit
+        const TIME_LIMIT = 9500; // 9.5 seconds hard limit
         const MAX_PAGES = 50; // Deep scan
         const AXIOS_CONFIG = { timeout: 9000 };
 

@@ -159,7 +159,11 @@ function App() {
       />
 
       <header className="main-header">
-        <div className="logo">
+        <div
+          className="logo"
+          onClick={() => setActiveView('scan')}
+          style={{ cursor: 'pointer' }}
+        >
           <Activity className="logo-icon" />
           <h1>VolumeScan<span className="text-accent">.xyz</span></h1>
         </div>

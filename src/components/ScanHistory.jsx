@@ -171,6 +171,24 @@ export default function ScanHistory({ session }) {
                                         <Wallet size={12} />
                                         {scan.wallet_address.slice(0, 6)}...{scan.wallet_address.slice(-4)}
                                     </div>
+                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                        {scan.verified && (
+                                            <span style={{ color: '#10b981', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                                <Layers size={12} /> Verified
+                                            </span>
+                                        )}
+                                        {scan.x_handle && (
+                                            <span style={{ color: '#1DA1F2', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                                <Twitter size={12} /> @{scan.x_handle}
+                                            </span>
+                                        )}
+                                        <button
+                                            onClick={(e) => handleDelete(scan.id, e)}
+                                            style={{
+                                                background: 'rgba(239, 68, 68, 0.1)',
+                                                border: '1px solid rgba(239, 68, 68, 0.2)',
+                                                color: '#ef4444',
+                                                padding: '4px',
                                                 borderRadius: '6px',
                                                 cursor: 'pointer',
                                                 display: 'flex',
@@ -209,8 +227,8 @@ export default function ScanHistory({ session }) {
                                     </div>
                                 </div>
                             </div>
-    )
-})}
+                        )
+                    })}
                 </div >
             )}
         </div >

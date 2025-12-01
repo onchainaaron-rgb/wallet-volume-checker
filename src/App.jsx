@@ -5,6 +5,7 @@ import WalletInput from './components/WalletInput'
 import ChainSelector from './components/ChainSelector'
 import ResultsTable from './components/ResultsTable'
 import AuthModal from './components/AuthModal'
+import CookieConsent from './components/CookieConsent'
 import { fetchRealWalletData } from './utils/covalentService'
 import { fetchWalletData as fetchMockData } from './utils/mockDataService'
 import { supabase } from './supabaseClient'
@@ -94,6 +95,7 @@ function App() {
 
   return (
     <div className="app-container">
+      <CookieConsent />
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}

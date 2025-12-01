@@ -1,4 +1,3 @@
-
 import { useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { Activity, ShieldCheck } from 'lucide-react'
@@ -107,17 +106,6 @@ export default function AuthModal({ isOpen, onClose }) {
                         Continue with Google
                     </button>
 
-                    {/* Telegram Login is tricky with Supabase OAuth directly in a modal sometimes, 
-              but we will try the standard OAuth flow. 
-              Note: Telegram Auth usually requires a widget. 
-              For now, we will use the 'discord' or 'twitter' as placeholders if Telegram is complex, 
-              but Supabase DOES support Telegram. Let's assume standard OAuth flow works or we might need a widget.
-              Actually, Supabase Telegram auth is a bit different (widget based). 
-              Let's stick to Google for now as the primary "easy" one and maybe add Discord/Twitter which are standard OAuth.
-              User specifically asked for Telegram. 
-              Supabase Telegram auth requires a bot token and is a bit manual.
-              I will add a "Coming Soon" or just a generic button that tries it.
-          */}
                     <button
                         onClick={() => handleLogin('discord')}
                         disabled={loading}
@@ -137,14 +125,18 @@ export default function AuthModal({ isOpen, onClose }) {
                             opacity: loading ? 0.7 : 1
                         }}
                     >
-                        {/* Using Discord as a robust alternative for "Social" login if TG is hard to setup without bot */}
                         <img src="https://www.svgrepo.com/show/353655/discord-icon.svg" width="24" alt="Discord" style={{ filter: 'brightness(0) invert(1)' }} />
                         Continue with Discord
                     </button>
                 </div>
 
-                <p style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: '#555' }}>
+                <p style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: '#555', lineHeight: '1.4' }}>
                     By continuing, you agree to our Terms of Service and Privacy Policy.
+                    <br />
+                    <span style={{ opacity: 0.7 }}>
+                        Disclaimer: This tool is for informational purposes only. We do not guarantee the accuracy of the data.
+                        Use at your own risk.
+                    </span>
                 </p>
             </div>
         </div>

@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 
 const BASE_URL = 'https://api.covalenthq.com/v1';
@@ -34,7 +33,8 @@ export default async function handler(req, res) {
         let pageNumber = 0;
         let totalVolume = 0;
         let txCount = 0;
-        const MAX_PAGES = 20; // Scan up to 2000 events
+        const MAX_PAGES = 10; // Reduced to 10 (1000 events) to prevent Vercel timeouts
+        const AXIOS_CONFIG = { timeout: 9000 }; // 9s timeout
 
         console.log(`Starting Deep Scan for Chain ${chain} - ${address}`);
 
@@ -51,7 +51,7 @@ export default async function handler(req, res) {
             console.log(`Fetching Page ${pageNumber} for Chain ${chain}...`);
 
             try {
-                const response = await axios.get(url);
+                const response = await axios.get(url, AXIOS_CONFIG);
                 const items = response.data.data.items;
 
                 if (!items || items.length === 0) {
@@ -81,6 +81,11 @@ export default async function handler(req, res) {
                     pageNumber++;
                 }
             } catch (err) {
+                if (err.code === 'ECONNABORTED') {
+                    console.warn(`Timeout fetching page ${pageNumber} for ${chain}`);
+                    hasMore = false;
+                    break;
+                }
                 if (err.response && [400, 410, 501].includes(err.response.status)) {
                     hasMore = false;
                     break;
@@ -102,7 +107,7 @@ export default async function handler(req, res) {
                 let url = `${BASE_URL}/${chain}/address/${address}/transactions_v3/?key=${API_KEY}&page-number=${pageNumber}&page-size=100&quote-currency=USD`;
 
                 try {
-                    const response = await axios.get(url);
+                    const response = await axios.get(url, AXIOS_CONFIG);
                     const items = response.data.data.items;
 
                     if (!items || items.length === 0) {

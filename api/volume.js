@@ -34,7 +34,7 @@ export default async function handler(req, res) {
         let pageNumber = 0;
         let totalVolume = 0;
         let txCount = 0;
-        const MAX_PAGES = 5; // Scan up to 500 transfer events per chain for speed
+        const MAX_PAGES = 20; // Increased to scan up to 2000 events
 
         console.log(`Starting Deep Scan for Chain ${chain} - ${address}`);
 
@@ -43,11 +43,9 @@ export default async function handler(req, res) {
             let isSolana = chain === '1399811149';
 
             if (isSolana) {
-                // Solana does not support transactions_v3 (returns 501), so we try transactions_v2
-                url = `${BASE_URL}/${chain}/address/${address}/transactions_v2/?key=${API_KEY}&page-number=${pageNumber}&page-size=50`;
+                url = `${BASE_URL}/${chain}/address/${address}/transactions_v2/?key=${API_KEY}&page-number=${pageNumber}&page-size=100&quote-currency=USD`;
             } else {
-                // EVM chains support transfers_v2 which is better for "In + Out" volume
-                url = `${BASE_URL}/${chain}/address/${address}/transfers_v2/?key=${API_KEY}&page-number=${pageNumber}&page-size=100`;
+                url = `${BASE_URL}/${chain}/address/${address}/transfers_v2/?key=${API_KEY}&page-number=${pageNumber}&page-size=100&quote-currency=USD`;
             }
 
             console.log(`Fetching Page ${pageNumber} for Chain ${chain}...`);
@@ -57,35 +55,34 @@ export default async function handler(req, res) {
                 const items = response.data.data.items;
 
                 if (!items || items.length === 0) {
+                    console.log(`No items found on page ${pageNumber} for chain ${chain}`);
                     hasMore = false;
                     break;
                 }
 
+                console.log(`Page ${pageNumber}: Found ${items.length} items.`);
+
                 const pageVolume = items.reduce((acc, item) => {
                     if (isSolana) {
-                        // SOLANA LOGIC (transactions_v3)
-                        // 1. Native SOL Value
                         let val = item.value_quote || 0;
-
-                        // 2. Fees
                         if (item.fees_paid && item.fees_paid.quote) {
                             val += item.fees_paid.quote;
                         }
-
                         return acc + val;
                     } else {
-                        // EVM LOGIC (transfers_v2)
                         if (item.transfers && item.transfers.length > 0) {
-                            return acc + item.transfers.reduce((tAcc, transfer) => tAcc + (transfer.quote || 0), 0);
+                            const transferVal = item.transfers.reduce((tAcc, transfer) => tAcc + (transfer.quote || 0), 0);
+                            return acc + transferVal;
                         }
                         return acc;
                     }
                 }, 0);
 
+                console.log(`Page ${pageNumber} Volume: $${pageVolume.toFixed(2)}`);
+
                 totalVolume += pageVolume;
                 txCount += items.length;
 
-                // Check if we should continue
                 if (!response.data.data.pagination || !response.data.data.pagination.has_more) {
                     hasMore = false;
                 } else {
@@ -93,19 +90,15 @@ export default async function handler(req, res) {
                 }
 
             } catch (err) {
-                // Handle specific API errors gracefully
                 if (err.response) {
                     const status = err.response.status;
-                    // 400: Malformed address (e.g. Solana address on ETH chain) -> Ignore
-                    // 410: Chain sunsetted (e.g. Zora) -> Ignore
-                    // 501: Not Implemented -> Ignore
                     if (status === 400 || status === 410 || status === 501) {
-                        console.warn(`Skipping chain ${chain} due to API status ${status} (likely incompatible address or chain)`);
-                        hasMore = false; // Stop trying this chain
+                        console.warn(`Skipping chain ${chain} due to API status ${status}`);
+                        hasMore = false;
                         break;
                     }
                 }
-                throw err; // Re-throw other errors to be caught by the outer catch
+                throw err;
             }
         }
 

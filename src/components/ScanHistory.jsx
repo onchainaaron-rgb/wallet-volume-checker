@@ -17,7 +17,8 @@ export default function ScanHistory({ session }) {
             const { data, error } = await supabase
                 .from('scans')
                 .select('*')
-                .order('total_volume', { ascending: false }) // Sort by highest volume (potential airdrop)
+                .eq('user_id', session.user.id)
+                .order('created_at', { ascending: false })
 
             if (error) throw error
             setScans(data)

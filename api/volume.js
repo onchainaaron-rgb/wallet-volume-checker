@@ -35,16 +35,25 @@ export default async function handler(req, res) {
     }
 
     try {
+        const START_TIME = Date.now();
+        const TIME_LIMIT = 8500; // 8.5 seconds hard limit
+        const MAX_PAGES = 100; // Try to get 10,000 txs if time permits
+        const AXIOS_CONFIG = { timeout: 9000 };
+
         let hasMore = true;
         let pageNumber = 0;
         let totalVolume = 0;
         let txCount = 0;
-        const MAX_PAGES = 10;
-        const AXIOS_CONFIG = { timeout: 9000 };
 
-        log(`Starting Scan: Chain ${chain}, Address ${address}`);
+        log(`Starting Deep Scan: Chain ${chain}, Address ${address}`);
 
         while (hasMore && pageNumber < MAX_PAGES) {
+            // TIME CHECK
+            if (Date.now() - START_TIME > TIME_LIMIT) {
+                log(`Time Limit Reached (${Date.now() - START_TIME}ms). Stopping scan at page ${pageNumber}.`);
+                break;
+            }
+
             let url;
             let isSolana = chain === '1399811149';
 
@@ -79,7 +88,7 @@ export default async function handler(req, res) {
                     }
                 }, 0);
 
-                log(`Page ${pageNumber} Volume: $${pageVolume.toFixed(2)}`);
+                log(`Page ${pageNumber} Vol: $${pageVolume.toFixed(2)}`);
                 totalVolume += pageVolume;
                 txCount += items.length;
 
@@ -100,20 +109,28 @@ export default async function handler(req, res) {
                     break;
                 }
                 log(`Unknown Error on page ${pageNumber}: ${err.message}`);
-                throw err;
+                // Don't throw, just return what we have
+                hasMore = false;
             }
         }
 
-        // FALLBACK
+        // FALLBACK LOGIC (Only if we have time left)
         let isSolana = chain === '1399811149';
-        if (totalVolume < 1 && !isSolana) {
-            log(`Volume low ($${totalVolume.toFixed(2)}). Trying Fallback (transactions_v3)...`);
+        let isBSC = chain === '56';
+        let timeLeft = TIME_LIMIT - (Date.now() - START_TIME);
+
+        // Aggressive Fallback for BSC or extremely low volume chains
+        // If BSC volume is suspiciously low (<$1000) OR we just want to be sure, check transactions_v3
+        if ((totalVolume < 1000 || isBSC) && !isSolana && timeLeft > 1000) {
+            log(`Checking Fallback (transactions_v3) for ${chain}. Time left: ${timeLeft}ms`);
 
             let fallbackVolume = 0;
             hasMore = true;
             pageNumber = 0;
 
-            while (hasMore && pageNumber < 5) {
+            while (hasMore && pageNumber < 5) { // Limit fallback depth to save time
+                if (Date.now() - START_TIME > TIME_LIMIT) break;
+
                 let url = `${BASE_URL}/${chain}/address/${address}/transactions_v3/?key=${API_KEY}&page-number=${pageNumber}&page-size=100&quote-currency=USD`;
 
                 try {
@@ -130,7 +147,6 @@ export default async function handler(req, res) {
                     }, 0);
 
                     fallbackVolume += pageVolume;
-                    log(`Fallback Page ${pageNumber} Volume: $${pageVolume.toFixed(2)}`);
 
                     if (!response.data.data.pagination || !response.data.data.pagination.has_more) {
                         hasMore = false;
@@ -144,8 +160,10 @@ export default async function handler(req, res) {
             }
 
             if (fallbackVolume > totalVolume) {
-                log(`Fallback used. New Volume: $${fallbackVolume.toFixed(2)}`);
+                log(`Fallback yielded higher volume: $${fallbackVolume.toFixed(2)} vs $${totalVolume.toFixed(2)}`);
                 totalVolume = fallbackVolume;
+            } else {
+                log(`Fallback yielded lower/equal volume: $${fallbackVolume.toFixed(2)}. Keeping original.`);
             }
         }
 

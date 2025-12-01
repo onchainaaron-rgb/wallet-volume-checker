@@ -60,19 +60,23 @@ function App() {
     setIsTelegramGateOpen(false)
   }
 
-  const saveScanToHistory = async (walletData) => {
-    if (!session) return
+  const handleSaveHistory = async () => {
+    if (!session || results.length === 0) return
+
+    const saves = results.map(result => ({
+      user_id: session.user.id,
+      wallet_address: result.address,
+      chains: selectedChains,
+      total_volume: result.totalVolume
+    }))
 
     try {
-      const { error } = await supabase.from('scans').insert({
-        user_id: session.user.id,
-        wallet_address: walletData.wallet,
-        chains: selectedChains,
-        total_volume: walletData.totalVolume
-      })
-      if (error) console.error('Error saving scan:', error)
+      const { error } = await supabase.from('scans').insert(saves)
+      if (error) throw error
+      alert('Scan saved to history!')
     } catch (err) {
       console.error('Failed to save scan:', err)
+      alert('Failed to save scan. Please try again.')
     }
   }
 
@@ -118,9 +122,6 @@ function App() {
         }
         newResults.push(data)
         setResults([...newResults])
-
-        // Save to history
-        await saveScanToHistory(data)
       }
 
       const elapsed = Date.now() - startTime
@@ -261,6 +262,18 @@ function App() {
             {results.length > 0 && (
               <div className="results-section">
                 <ResultsTable results={results} selectedChains={selectedChains} />
+
+                {session && (
+                  <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
+                    <button
+                      className="btn-secondary"
+                      onClick={handleSaveHistory}
+                      style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                    >
+                      <History size={16} /> Add Scan to History
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </>

@@ -1,8 +1,8 @@
 {
     "rewrites": [
         {
-            "source": "/api/(.*)",
-            "destination": "/api/$1"
+            "source": "/api/volume/:chain/:address",
+            "destination": "/api/volume.js?chain=:chain&address=:address"
         },
         {
             "source": "/(.*)",

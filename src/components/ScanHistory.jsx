@@ -105,13 +105,9 @@ export default function ScanHistory({ session }) {
                 <select
                     value={sortOrder}
                     onChange={(e) => setSortOrder(e.target.value)}
+                    className="input-field"
                     style={{
-                        padding: '0.6rem 1rem',
-                        borderRadius: '8px',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        background: 'rgba(0, 0, 0, 0.2)',
-                        color: '#fff',
-                        fontSize: '0.9rem',
+                        width: 'auto',
                         cursor: 'pointer'
                     }}
                 >
@@ -124,14 +120,6 @@ export default function ScanHistory({ session }) {
                 <button
                     onClick={fetchScans}
                     className="btn-secondary"
-                    style={{
-                        padding: '0.6rem 1.2rem',
-                        fontSize: '0.9rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        whiteSpace: 'nowrap'
-                    }}
                     disabled={loading}
                 >
                     <Layers size={16} />

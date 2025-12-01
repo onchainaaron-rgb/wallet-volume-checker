@@ -79,15 +79,7 @@ const GlobalLeaderboard = () => {
                         placeholder="Search wallet address..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        style={{
-                            width: '100%',
-                            padding: '0.6rem 1rem',
-                            borderRadius: '8px',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            background: 'rgba(0, 0, 0, 0.2)',
-                            color: '#fff',
-                            fontSize: '0.9rem'
-                        }}
+                        className="input-field"
                     />
                 </div>
             </div>

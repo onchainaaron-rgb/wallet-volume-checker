@@ -207,8 +207,7 @@ function App() {
         <div className="header-controls" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <button
             onClick={() => setActiveView('leaderboard')}
-            className={activeView === 'leaderboard' ? 'nav-btn active' : 'nav-btn'}
-            style={{ background: 'none', border: 'none', color: activeView === 'leaderboard' ? '#00f0ff' : '#666', cursor: 'pointer', display: 'flex', gap: '0.5rem', alignItems: 'center' }}
+            className={`nav-btn ${activeView === 'leaderboard' ? 'active' : ''}`}
           >
             <Trophy size={18} /> Leaderboard
           </button>
@@ -217,15 +216,13 @@ function App() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <button
                 onClick={() => setActiveView('scan')}
-                className={activeView === 'scan' ? 'nav-btn active' : 'nav-btn'}
-                style={{ background: 'none', border: 'none', color: activeView === 'scan' ? '#00f0ff' : '#666', cursor: 'pointer', display: 'flex', gap: '0.5rem', alignItems: 'center' }}
+                className={`nav-btn ${activeView === 'scan' ? 'active' : ''}`}
               >
                 <Search size={18} /> Scan
               </button>
               <button
                 onClick={() => setActiveView('my-scans')}
-                className={activeView === 'my-scans' ? 'nav-btn active' : 'nav-btn'}
-                style={{ background: 'none', border: 'none', color: activeView === 'my-scans' ? '#00f0ff' : '#666', cursor: 'pointer', display: 'flex', gap: '0.5rem', alignItems: 'center' }}
+                className={`nav-btn ${activeView === 'my-scans' ? 'active' : ''}`}
               >
                 <List size={18} /> My Scans
               </button>

@@ -6,6 +6,7 @@ import ChainSelector from './components/ChainSelector'
 import ResultsTable from './components/ResultsTable'
 import AuthModal from './components/AuthModal'
 import CookieConsent from './components/CookieConsent'
+import TelegramGateModal from './components/TelegramGateModal'
 import { fetchRealWalletData } from './utils/covalentService'
 import { fetchWalletData as fetchMockData } from './utils/mockDataService'
 import { supabase } from './supabaseClient'
@@ -22,6 +23,11 @@ function App() {
   const [session, setSession] = useState(null)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
 
+  // Telegram Gate State
+  const [searchCount, setSearchCount] = useState(0)
+  const [isTelegramGateOpen, setIsTelegramGateOpen] = useState(false)
+  const [isTelegramUnlocked, setIsTelegramUnlocked] = useState(false)
+
   useEffect(() => {
     // Check active session
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -35,8 +41,23 @@ function App() {
       setSession(session)
     })
 
+    // Check local storage for Telegram unlock
+    const unlocked = localStorage.getItem('telegramGateUnlocked')
+    if (unlocked === 'true') {
+      setIsTelegramUnlocked(true)
+    }
+
     return () => subscription.unsubscribe()
   }, [])
+
+  const handleUnlockTelegram = () => {
+    localStorage.setItem('telegramGateUnlocked', 'true')
+    setIsTelegramUnlocked(true)
+    setIsTelegramGateOpen(false)
+    // Automatically trigger the analysis that was blocked?
+    // For simplicity, user just clicks "Start Analysis" again or we could trigger it.
+    // Let's just close the modal and let them click again to avoid complexity with stale state.
+  }
 
   const handleAnalyze = async () => {
     console.log("Analyze clicked. Session:", !!session);
@@ -45,6 +66,12 @@ function App() {
     // AUTH GATE
     if (!session) {
       setIsAuthModalOpen(true)
+      return
+    }
+
+    // TELEGRAM GATE (Trigger after 1st search if not unlocked)
+    if (searchCount >= 1 && !isTelegramUnlocked) {
+      setIsTelegramGateOpen(true)
       return
     }
 
@@ -81,6 +108,9 @@ function App() {
         await new Promise(r => setTimeout(r, 1500 - elapsed))
       }
 
+      // Increment search count on success
+      setSearchCount(prev => prev + 1)
+
     } catch (error) {
       console.error("Error during analysis:", error);
       setError(error.message || "An error occurred during analysis.")
@@ -99,6 +129,10 @@ function App() {
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
+      />
+      <TelegramGateModal
+        isOpen={isTelegramGateOpen}
+        onUnlock={handleUnlockTelegram}
       />
 
       <header className="main-header">

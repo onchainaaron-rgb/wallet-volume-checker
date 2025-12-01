@@ -33,25 +33,30 @@ export const fetchRealWalletData = async (wallet, chains) => {
             const response = await fetch(`${BACKEND_URL}/${chainName}/${wallet}`);
             const data = await response.json();
 
-            return { chain, volume: data.volume || 0 };
+            return { chain, volume: data.volume || 0, debugLogs: data.debugLogs || [] };
         } catch (err) {
             console.error(`Failed to fetch ${chain}`, err);
-            return { chain, volume: 0 };
+            return { chain, volume: 0, debugLogs: [`Frontend Fetch Error for ${chain}: ${err.message}`] };
         }
     });
 
     const chainResults = await Promise.all(promises);
+    const allDebugLogs = [];
 
     chainResults.forEach(item => {
         results[item.chain] = item.volume;
         totalVolume += item.volume;
+        if (item.debugLogs) {
+            allDebugLogs.push(...item.debugLogs);
+        }
     });
 
     return {
         address: wallet,
         chainVolumes: results,
         totalVolume: totalVolume,
-        airdropPotential: calculateAirdropPotential(totalVolume)
+        airdropPotential: calculateAirdropPotential(totalVolume),
+        debugLogs: allDebugLogs
     };
 };
 

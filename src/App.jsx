@@ -139,6 +139,12 @@ function App() {
         if (useRealData) {
           try {
             data = await fetchRealWalletData(wallet, selectedChains)
+
+            // Display Backend Logs
+            if (data.debugLogs && data.debugLogs.length > 0) {
+              data.debugLogs.forEach(log => addLog(`[BACKEND] ${log}`));
+            }
+
             addLog(`Data fetched: $${data.totalVolume?.toFixed(2)} volume`)
           } catch (fetchErr) {
             addLog(`Fetch failed: ${fetchErr.message}`)

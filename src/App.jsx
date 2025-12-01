@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import { Activity, Play, LogOut, User, History, Search, Trophy, List, CheckCircle, Twitter } from 'lucide-react'
+import { Activity, Play, LogOut, User, History, Search, Trophy, List, CheckCircle } from 'lucide-react'
+import XLogo from './components/XLogo'
 import WalletInput from './components/WalletInput'
 import ChainSelector from './components/ChainSelector'
 import ResultsTable from './components/ResultsTable'
@@ -191,8 +192,14 @@ function App() {
     // Update local session state to reflect change immediately
     if (session) {
       const newSession = { ...session }
-      newSession.user.user_metadata.x_handle = handle
-      newSession.user.user_metadata.id_verified = true
+      if (handle) {
+        newSession.user.user_metadata.x_handle = handle
+        newSession.user.user_metadata.id_verified = true
+      } else {
+        // Disconnect
+        newSession.user.user_metadata.x_handle = null
+        newSession.user.user_metadata.id_verified = false
+      }
       setSession(newSession)
     }
   }
@@ -235,21 +242,25 @@ function App() {
           {session ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               {session.user.user_metadata?.id_verified ? (
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  background: 'rgba(29, 161, 242, 0.1)',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '20px',
-                  border: '1px solid rgba(29, 161, 242, 0.2)'
-                }}>
-                  <Twitter size={14} color="#1DA1F2" />
-                  <span style={{ color: '#1DA1F2', fontSize: '0.85rem', fontWeight: '600' }}>
+                <button
+                  onClick={() => setIsVerificationModalOpen(true)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '20px',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    cursor: 'pointer',
+                    color: 'inherit'
+                  }}>
+                  <XLogo size={14} color="#fff" />
+                  <span style={{ color: '#fff', fontSize: '0.85rem', fontWeight: '600' }}>
                     @{session.user.user_metadata.x_handle}
                   </span>
                   <CheckCircle size={14} color="#1DA1F2" />
-                </div>
+                </button>
               ) : (
                 <button
                   onClick={() => setIsVerificationModalOpen(true)}
@@ -257,11 +268,11 @@ function App() {
                   style={{
                     fontSize: '0.85rem',
                     padding: '0.5rem 1rem',
-                    borderColor: '#1DA1F2',
-                    color: '#1DA1F2'
+                    borderColor: '#fff',
+                    color: '#fff'
                   }}
                 >
-                  <Twitter size={14} style={{ marginRight: '0.5rem' }} />
+                  <XLogo size={14} style={{ marginRight: '0.5rem' }} />
                   Verify ID
                 </button>
               )}

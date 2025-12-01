@@ -9,7 +9,7 @@ export default function ScanHistory({ session }) {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [searchTerm, setSearchTerm] = useState('')
-    const [sortOrder, setSortOrder] = useState('newest')
+    const [sortOrder, setSortOrder] = useState('highest')
 
     useEffect(() => {
         if (session) {

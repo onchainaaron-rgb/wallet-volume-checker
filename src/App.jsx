@@ -125,7 +125,7 @@ function App() {
         await saveScanToHistory(data)
       }
 
-      const elapsed = Date.Now() - startTime
+      const elapsed = Date.now() - startTime
       if (elapsed < 1500) {
         await new Promise(r => setTimeout(r, 1500 - elapsed))
       }

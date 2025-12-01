@@ -30,7 +30,7 @@ function App() {
   const [isTelegramUnlocked, setIsTelegramUnlocked] = useState(false)
 
   // View State
-  const [activeView, setActiveView] = useState('scan') // 'scan' or 'history'
+  const [activeView, setActiveView] = useState('scan') // 'scan' or 'leaderboard'
 
   useEffect(() => {
     // Check active session
@@ -60,23 +60,19 @@ function App() {
     setIsTelegramGateOpen(false)
   }
 
-  const handleSaveHistory = async () => {
-    if (!session || results.length === 0) return
-
-    const saves = results.map(result => ({
-      user_id: session.user.id,
-      wallet_address: result.address,
-      chains: selectedChains,
-      total_volume: result.totalVolume
-    }))
+  const saveScanToHistory = async (walletData) => {
+    if (!session) return
 
     try {
-      const { error } = await supabase.from('scans').insert(saves)
-      if (error) throw error
-      alert('Scan saved to history!')
+      const { error } = await supabase.from('scans').insert({
+        user_id: session.user.id,
+        wallet_address: walletData.wallet,
+        chains: selectedChains,
+        total_volume: walletData.totalVolume
+      })
+      if (error) console.error('Error saving scan:', error)
     } catch (err) {
       console.error('Failed to save scan:', err)
-      alert('Failed to save scan. Please try again.')
     }
   }
 
@@ -122,6 +118,9 @@ function App() {
         }
         newResults.push(data)
         setResults([...newResults])
+
+        // Auto-save to history/leaderboard
+        await saveScanToHistory(data)
       }
 
       const elapsed = Date.now() - startTime
@@ -173,11 +172,11 @@ function App() {
                 <Search size={18} /> Scan
               </button>
               <button
-                onClick={() => setActiveView('history')}
-                className={activeView === 'history' ? 'nav-btn active' : 'nav-btn'}
-                style={{ background: 'none', border: 'none', color: activeView === 'history' ? '#00f0ff' : '#666', cursor: 'pointer', display: 'flex', gap: '0.5rem', alignItems: 'center' }}
+                onClick={() => setActiveView('leaderboard')}
+                className={activeView === 'leaderboard' ? 'nav-btn active' : 'nav-btn'}
+                style={{ background: 'none', border: 'none', color: activeView === 'leaderboard' ? '#00f0ff' : '#666', cursor: 'pointer', display: 'flex', gap: '0.5rem', alignItems: 'center' }}
               >
-                <History size={18} /> History
+                <History size={18} /> Leaderboard
               </button>
               <div className="user-badge">
                 {session.user.user_metadata.avatar_url ? (
@@ -261,27 +260,18 @@ function App() {
 
             {results.length > 0 && (
               <div className="results-section">
-                <ResultsTable results={results} selectedChains={selectedChains} />
-
-                {session && (
-                  <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
-                    <button
-                      className="btn-secondary"
-                      onClick={handleSaveHistory}
-                      style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                    >
-                      <History size={16} /> Add Scan to History
-                    </button>
-                  </div>
-                )}
+                <ResultsTable
+                  results={results}
+                  selectedChains={selectedChains}
+                />
               </div>
             )}
           </>
         ) : (
           <div className="history-section" style={{ maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
             <div className="hero-section">
-              <h1 className="hero-title">Your <span className="text-gradient">Scan History</span></h1>
-              <p className="hero-subtitle">Track your past analyses and identify high-potential wallets.</p>
+              <h1 className="hero-title">Your <span className="text-gradient">Wallet Leaderboard</span></h1>
+              <p className="hero-subtitle">Track your top wallets and flex your volume rankings.</p>
             </div>
             <ScanHistory session={session} />
           </div>

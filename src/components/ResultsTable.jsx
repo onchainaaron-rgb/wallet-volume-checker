@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Plus } from 'lucide-react'
 import AirdropBadge from './AirdropBadge'
 import './ResultsTable.css'
 

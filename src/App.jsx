@@ -78,11 +78,11 @@ function App() {
       return
     }
 
-    addLog(`Saving scan for ${walletData.wallet}...`)
+    addLog(`Saving scan for ${walletData.address}...`)
     try {
       const { error } = await supabase.from('scans').insert({
         user_id: session.user.id,
-        wallet_address: walletData.wallet,
+        wallet_address: walletData.address,
         chains: selectedChains,
         total_volume: walletData.totalVolume
       })

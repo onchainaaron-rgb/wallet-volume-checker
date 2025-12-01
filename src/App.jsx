@@ -206,23 +206,42 @@ function App() {
         </div>
       </header>
 
-      <main className="main-content">
+      <main className="container">
         {activeView === 'scan' ? (
           <>
             <div className="hero-section">
-              <h2>Check Your <span className="text-accent">Airdrop Eligibility</span></h2>
-              <p>Analyze your wallet volume across multiple chains instantly.</p>
+              <h1 className="hero-title">Lifetime Volume <span className="text-gradient">Checker</span></h1>
+              <p className="hero-subtitle">Analyze cross-chain transaction history for any wallet address.</p>
             </div>
 
-            <div className="input-section">
+            <div className="grid-layout">
               <WalletInput onWalletsChange={setWallets} />
-              <ChainSelector onChainsChange={setSelectedChains} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <ChainSelector onChainsChange={setSelectedChains} />
 
-              <div className="action-area">
+                {error && (
+                  <div style={{
+                    background: 'rgba(255, 50, 50, 0.1)',
+                    border: '1px solid #ff4444',
+                    color: '#ff4444',
+                    padding: '1rem',
+                    borderRadius: '8px',
+                    fontSize: '0.9rem'
+                  }}>
+                    <strong>Error:</strong> {error}
+                  </div>
+                )}
+
                 <button
-                  className={`analyze-btn ${isLoading ? 'loading' : ''}`}
+                  className="btn-primary"
                   onClick={handleAnalyze}
                   disabled={isLoading}
+                  style={{
+                    width: '100%',
+                    justifyContent: 'center',
+                    padding: '1rem',
+                    fontSize: '1.1rem'
+                  }}
                 >
                   {isLoading ? (
                     <>
@@ -236,7 +255,6 @@ function App() {
                     </>
                   )}
                 </button>
-                {error && <div className="error-message">{error}</div>}
               </div>
             </div>
 
@@ -249,8 +267,8 @@ function App() {
         ) : (
           <div className="history-section" style={{ maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
             <div className="hero-section">
-              <h2>Your <span className="text-accent">Scan History</span></h2>
-              <p>Track your past analyses and identify high-potential wallets.</p>
+              <h1 className="hero-title">Your <span className="text-gradient">Scan History</span></h1>
+              <p className="hero-subtitle">Track your past analyses and identify high-potential wallets.</p>
             </div>
             <ScanHistory session={session} />
           </div>

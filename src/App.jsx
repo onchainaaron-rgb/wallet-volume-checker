@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from 'react'
 import './App.css'
-import { Activity, Play, LogOut, User, History, Search } from 'lucide-react'
+import { Activity, Play, LogOut, User, History, Search, Trophy, List } from 'lucide-react'
 import WalletInput from './components/WalletInput'
 import ChainSelector from './components/ChainSelector'
 import ResultsTable from './components/ResultsTable'
@@ -8,6 +9,7 @@ import AuthModal from './components/AuthModal'
 import CookieConsent from './components/CookieConsent'
 import TelegramGateModal from './components/TelegramGateModal'
 import ScanHistory from './components/ScanHistory'
+import GlobalLeaderboard from './components/GlobalLeaderboard'
 import { fetchRealWalletData } from './utils/covalentService'
 import { fetchWalletData as fetchMockData } from './utils/mockDataService'
 import { supabase } from './supabaseClient'
@@ -30,7 +32,7 @@ function App() {
   const [isTelegramUnlocked, setIsTelegramUnlocked] = useState(false)
 
   // View State
-  const [activeView, setActiveView] = useState('scan') // 'scan' or 'leaderboard'
+  const [activeView, setActiveView] = useState('scan') // 'scan', 'my-scans', 'leaderboard'
 
   useEffect(() => {
     // Check active session
@@ -119,11 +121,11 @@ function App() {
         newResults.push(data)
         setResults([...newResults])
 
-        // Auto-save to history/leaderboard
+        // Auto-save to history
         await saveScanToHistory(data)
       }
 
-      const elapsed = Date.now() - startTime
+      const elapsed = Date.Now() - startTime
       if (elapsed < 1500) {
         await new Promise(r => setTimeout(r, 1500 - elapsed))
       }
@@ -162,6 +164,14 @@ function App() {
           <h1>VolumeScan<span className="text-accent">.xyz</span></h1>
         </div>
         <div className="header-controls" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <button
+            onClick={() => setActiveView('leaderboard')}
+            className={activeView === 'leaderboard' ? 'nav-btn active' : 'nav-btn'}
+            style={{ background: 'none', border: 'none', color: activeView === 'leaderboard' ? '#00f0ff' : '#666', cursor: 'pointer', display: 'flex', gap: '0.5rem', alignItems: 'center' }}
+          >
+            <Trophy size={18} /> Leaderboard
+          </button>
+
           {session ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <button
@@ -172,11 +182,11 @@ function App() {
                 <Search size={18} /> Scan
               </button>
               <button
-                onClick={() => setActiveView('leaderboard')}
-                className={activeView === 'leaderboard' ? 'nav-btn active' : 'nav-btn'}
-                style={{ background: 'none', border: 'none', color: activeView === 'leaderboard' ? '#00f0ff' : '#666', cursor: 'pointer', display: 'flex', gap: '0.5rem', alignItems: 'center' }}
+                onClick={() => setActiveView('my-scans')}
+                className={activeView === 'my-scans' ? 'nav-btn active' : 'nav-btn'}
+                style={{ background: 'none', border: 'none', color: activeView === 'my-scans' ? '#00f0ff' : '#666', cursor: 'pointer', display: 'flex', gap: '0.5rem', alignItems: 'center' }}
               >
-                <History size={18} /> Leaderboard
+                <List size={18} /> My Scans
               </button>
               <div className="user-badge">
                 {session.user.user_metadata.avatar_url ? (
@@ -207,7 +217,7 @@ function App() {
       </header>
 
       <main className="container">
-        {activeView === 'scan' ? (
+        {activeView === 'scan' && (
           <>
             <div className="hero-section">
               <h1 className="hero-title">Lifetime Volume <span className="text-gradient">Checker</span></h1>
@@ -267,13 +277,25 @@ function App() {
               </div>
             )}
           </>
-        ) : (
+        )}
+
+        {activeView === 'my-scans' && (
           <div className="history-section" style={{ maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
             <div className="hero-section">
-              <h1 className="hero-title">Your <span className="text-gradient">Wallet Leaderboard</span></h1>
-              <p className="hero-subtitle">Track your top wallets and flex your volume rankings.</p>
+              <h1 className="hero-title">My <span className="text-gradient">Scans</span></h1>
+              <p className="hero-subtitle">Track your past analyses and identify high-potential wallets.</p>
             </div>
             <ScanHistory session={session} />
+          </div>
+        )}
+
+        {activeView === 'leaderboard' && (
+          <div className="history-section" style={{ maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
+            <div className="hero-section">
+              <h1 className="hero-title">Global <span className="text-gradient">Leaderboard</span></h1>
+              <p className="hero-subtitle">Top wallets by volume across all users.</p>
+            </div>
+            <GlobalLeaderboard />
           </div>
         )}
       </main>
@@ -282,3 +304,4 @@ function App() {
 }
 
 export default App
+

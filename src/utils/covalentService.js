@@ -24,23 +24,33 @@ export const fetchRealWalletData = async (wallet, chains) => {
     const results = {};
     let totalVolume = 0;
 
-    const promises = chains.map(async (chain) => {
-        const chainName = CHAIN_MAP[chain];
-        if (!chainName) return { chain, volume: 0 };
+    // Batch requests to prevent Rate Limiting (429s)
+    // We have 12 chains, and each chain does 2 parallel requests (Transfers + Txs) = 24 requests.
+    // Covalent free tier might limit this. Let's do batches of 3 chains (6 requests) at a time.
+    const BATCH_SIZE = 3;
+    const chainResults = [];
 
-        try {
-            // Call our own backend instead of Covalent directly
-            const response = await fetch(`${BACKEND_URL}/${chainName}/${wallet}`);
-            const data = await response.json();
+    for (let i = 0; i < chains.length; i += BATCH_SIZE) {
+        const batch = chains.slice(i, i + BATCH_SIZE);
+        const batchPromises = batch.map(async (chain) => {
+            const chainName = CHAIN_MAP[chain];
+            if (!chainName) return { chain, volume: 0 };
 
-            return { chain, volume: data.volume || 0, debugLogs: data.debugLogs || [] };
-        } catch (err) {
-            console.error(`Failed to fetch ${chain}`, err);
-            return { chain, volume: 0, debugLogs: [`Frontend Fetch Error for ${chain}: ${err.message}`] };
-        }
-    });
+            try {
+                // Call our own backend instead of Covalent directly
+                const response = await fetch(`${BACKEND_URL}/${chainName}/${wallet}`);
+                const data = await response.json();
 
-    const chainResults = await Promise.all(promises);
+                return { chain, volume: data.volume || 0, debugLogs: data.debugLogs || [] };
+            } catch (err) {
+                console.error(`Failed to fetch ${chain}`, err);
+                return { chain, volume: 0, debugLogs: [`Frontend Fetch Error for ${chain}: ${err.message}`] };
+            }
+        });
+
+        const batchResults = await Promise.all(batchPromises);
+        chainResults.push(...batchResults);
+    }
     const allDebugLogs = [];
 
     chainResults.forEach(item => {

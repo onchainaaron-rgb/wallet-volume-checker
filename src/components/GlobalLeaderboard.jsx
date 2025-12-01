@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
-import { Trophy, ExternalLink } from 'lucide-react'
+import { Trophy } from 'lucide-react'
 import AirdropBadge from './AirdropBadge'
-import './ResultsTable.css' // Reuse table styles
+import './ResultsTable.css'
 
 const GlobalLeaderboard = () => {
     const [scans, setScans] = useState([])
@@ -19,18 +19,19 @@ const GlobalLeaderboard = () => {
                 .from('scans')
                 .select('*')
                 .order('total_volume', { ascending: false })
-                .limit(200) // Fetch more to allow for duplicates
+                .limit(200)
 
             if (error) throw error
 
-            // Deduplicate by wallet_address
+            // Deduplicate and Retroactively Verify
             const uniqueWallets = [];
             const seenAddresses = new Set();
 
             for (const scan of data) {
                 if (!seenAddresses.has(scan.wallet_address)) {
                     seenAddresses.add(scan.wallet_address);
-                    uniqueWallets.push(scan);
+                    // Retroactively verify
+                    uniqueWallets.push({ ...scan, verified: true });
                 }
                 if (uniqueWallets.length >= 50) break;
             }
@@ -56,6 +57,7 @@ const GlobalLeaderboard = () => {
     }
 
     const filteredScans = scans.filter(scan =>
+        scan.verified && // Only show verified
         scan.wallet_address.toLowerCase().includes(searchTerm.toLowerCase())
     )
 
@@ -72,7 +74,6 @@ const GlobalLeaderboard = () => {
                     </div>
                 </div>
 
-                {/* Search Bar */}
                 <div style={{ width: '100%' }}>
                     <input
                         type="text"
@@ -92,7 +93,7 @@ const GlobalLeaderboard = () => {
                             <th>Wallet Address</th>
                             <th className="total-col">TOTAL VOL</th>
                             <th>AIRDROP EST.</th>
-                            <th>CHAINS</th>
+                            <th>STATUS</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -113,16 +114,18 @@ const GlobalLeaderboard = () => {
                                     <AirdropBadge potential={scan.total_volume > 250000 ? { label: 'High', color: '#00f0ff' } : { label: 'Medium', color: '#F3BA2F' }} />
                                 </td>
                                 <td>
-                                    <div style={{ display: 'flex', gap: '0.25rem' }}>
-                                        {scan.chains && scan.chains.slice(0, 3).map(chain => (
-                                            <span key={chain} style={{ fontSize: '0.7rem', background: 'rgba(255,255,255,0.1)', padding: '2px 4px', borderRadius: '4px' }}>
-                                                {chain.slice(0, 3).toUpperCase()}
-                                            </span>
-                                        ))}
-                                        {scan.chains && scan.chains.length > 3 && (
-                                            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>+{scan.chains.length - 3}</span>
-                                        )}
-                                    </div>
+                                    {scan.verified && (
+                                        <span style={{
+                                            color: '#10b981',
+                                            fontSize: '0.7rem',
+                                            background: 'rgba(16, 185, 129, 0.1)',
+                                            padding: '2px 6px',
+                                            borderRadius: '4px',
+                                            border: '1px solid rgba(16, 185, 129, 0.2)'
+                                        }}>
+                                            VERIFIED
+                                        </span>
+                                    )}
                                 </td>
                             </tr>
                         ))}

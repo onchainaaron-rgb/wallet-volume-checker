@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import { Wallet, Calendar, Layers } from 'lucide-react'
-import './ResultsTable.css' // Reuse the card styles
+import './ResultsTable.css'
+import './FlexCards.css'
 
 export default function ScanHistory({ session }) {
     const [scans, setScans] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [searchTerm, setSearchTerm] = useState('')
-    const [sortOrder, setSortOrder] = useState('newest') // newest, oldest, highest, lowest
+    const [sortOrder, setSortOrder] = useState('newest')
 
     useEffect(() => {
         if (session) {
@@ -17,7 +18,6 @@ export default function ScanHistory({ session }) {
     }, [session])
 
     const fetchScans = async () => {
-        console.log("Fetching scans for user:", session.user.id);
         setLoading(true)
         setError(null)
         try {
@@ -29,18 +29,18 @@ export default function ScanHistory({ session }) {
 
             if (error) throw error
 
-            // Deduplicate: Keep only the most recent scan for each wallet
+            // Deduplicate and Retroactively Verify
             const uniqueScans = [];
             const seenWallets = new Set();
 
             for (const scan of data) {
                 if (!seenWallets.has(scan.wallet_address)) {
                     seenWallets.add(scan.wallet_address);
-                    uniqueScans.push(scan);
+                    // User Request: "make everything we have scanned to date with the verifcation badge"
+                    uniqueScans.push({ ...scan, verified: true });
                 }
             }
 
-            console.log("Fetched unique scans:", uniqueScans);
             setScans(uniqueScans)
         } catch (error) {
             console.error('Error fetching scans:', error)
@@ -58,7 +58,6 @@ export default function ScanHistory({ session }) {
         }).format(val)
     }
 
-    // Filter and Sort
     const filteredScans = scans
         .filter(scan => scan.wallet_address.toLowerCase().includes(searchTerm.toLowerCase()))
         .sort((a, b) => {
@@ -138,72 +137,55 @@ export default function ScanHistory({ session }) {
             ) : filteredScans.length === 0 ? (
                 <div className="text-center p-4" style={{ color: '#888' }}>No scans match your search.</div>
             ) : (
-                <div className="cards-container">
+                <div className="flex-card-grid">
                     {filteredScans.map((scan) => {
                         const isWhale = scan.total_volume > 100000;
                         const isDegen = scan.total_volume > 10000 && scan.total_volume <= 100000;
+                        const cardClass = isWhale ? 'flex-card whale' : isDegen ? 'flex-card degen' : 'flex-card';
 
                         return (
-                            <div key={scan.id} className="result-card" style={{
-                                background: 'linear-gradient(145deg, rgba(20,20,25,0.9) 0%, rgba(10,10,15,0.95) 100%)',
-                                border: isWhale ? '1px solid #00f0ff' : '1px solid rgba(255,255,255,0.1)',
-                                boxShadow: isWhale ? '0 0 20px rgba(0, 240, 255, 0.1)' : 'none'
-                            }}>
-                                <div className="card-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '1rem' }}>
-                                    <div className="wallet-info">
-                                        <Wallet size={16} className="text-secondary" />
-                                        <span className="mono" style={{ fontSize: '0.9rem', color: '#888' }}>{scan.wallet_address}</span>
+                            <div key={scan.id} className={cardClass}>
+                                <div className="card-watermark">VOLUME</div>
+
+                                <div className="card-top">
+                                    <div className="wallet-pill">
+                                        <Wallet size={12} />
+                                        {scan.wallet_address.slice(0, 6)}...{scan.wallet_address.slice(-4)}
                                     </div>
-                                    <div className="scan-date" style={{ fontSize: '0.8rem', color: '#666', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <Calendar size={14} />
-                                        {new Date(scan.created_at).toLocaleDateString()}
+                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                        {scan.verified && (
+                                            <span style={{ color: '#10b981', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                                <Layers size={12} /> Verified
+                                            </span>
+                                        )}
+                                        <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)' }}>
+                                            {new Date(scan.created_at).toLocaleDateString()}
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="card-body" style={{ textAlign: 'center', padding: '1.5rem 0' }}>
-                                    <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px', color: '#666', marginBottom: '0.5rem' }}>
-                                        Verified Lifetime Volume
-                                    </div>
-                                    <div className="total-value text-gradient" style={{ fontSize: '2.5rem', fontWeight: '800', lineHeight: '1.1' }}>
+                                <div className="card-main">
+                                    <div className="volume-label">Verified Volume</div>
+                                    <div className="volume-amount">
                                         {formatCurrency(scan.total_volume)}
                                     </div>
+                                </div>
 
-                                    <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '0.5rem' }}>
-                                        {isWhale && (
-                                            <span style={{
-                                                background: 'rgba(0, 240, 255, 0.1)',
-                                                color: '#00f0ff',
-                                                padding: '4px 12px',
-                                                borderRadius: '20px',
-                                                fontSize: '0.8rem',
-                                                fontWeight: 'bold',
-                                                border: '1px solid rgba(0, 240, 255, 0.2)'
-                                            }}>
-                                                🐋 WHALE STATUS
-                                            </span>
-                                        )}
-                                        {isDegen && (
-                                            <span style={{
-                                                background: 'rgba(243, 186, 47, 0.1)',
-                                                color: '#F3BA2F',
-                                                padding: '4px 12px',
-                                                borderRadius: '20px',
-                                                fontSize: '0.8rem',
-                                                fontWeight: 'bold',
-                                                border: '1px solid rgba(243, 186, 47, 0.2)'
-                                            }}>
-                                                🔥 ACTIVE DEGEN
-                                            </span>
-                                        )}
-                                        <span style={{
-                                            background: 'rgba(255,255,255,0.05)',
-                                            color: '#888',
-                                            padding: '4px 12px',
-                                            borderRadius: '20px',
-                                            fontSize: '0.8rem'
-                                        }}>
-                                            {Array.isArray(scan.chains) ? `${scan.chains.length} Chains` : 'Multi-Chain'}
-                                        </span>
+                                <div className="card-footer">
+                                    <div className="brand-tag">VolumeScan</div>
+                                    <div className="status-badges">
+                                        {isWhale && <span className="badge whale">WHALE</span>}
+                                        {isDegen && <span className="badge degen">DEGEN</span>}
+                                        <button
+                                            className="badge chains"
+                                            style={{ cursor: 'pointer', border: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                alert('Saving card image... (Feature coming soon)');
+                                            }}
+                                        >
+                                            Share ↗
+                                        </button>
                                     </div>
                                 </div>
                             </div>

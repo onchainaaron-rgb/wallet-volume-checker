@@ -1,0 +1,199 @@
+/* Flex Card Styles - Trading Site Aesthetic */
+.flex-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.flex-card {
+    position: relative;
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.9) 0%, rgba(10, 15, 30, 0.95) 100%);
+    border-radius: 20px;
+    padding: 1.5rem;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 220px;
+}
+
+.flex-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.flex-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Whale Card Variant */
+.flex-card.whale {
+    background: linear-gradient(145deg, rgba(10, 30, 50, 0.95) 0%, rgba(5, 15, 30, 0.98) 100%);
+}
+
+.flex-card.whale::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #00f0ff, transparent);
+    opacity: 0.5;
+}
+
+.flex-card.whale:hover {
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.15);
+}
+
+/* Degen Card Variant */
+.flex-card.degen {
+    background: linear-gradient(145deg, rgba(30, 25, 10, 0.95) 0%, rgba(20, 15, 5, 0.98) 100%);
+}
+
+.flex-card.degen::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #F3BA2F, transparent);
+    opacity: 0.5;
+}
+
+.flex-card.degen:hover {
+    box-shadow: 0 0 30px rgba(243, 186, 47, 0.15);
+}
+
+.card-watermark {
+    position: absolute;
+    bottom: -20px;
+    right: -20px;
+    font-size: 8rem;
+    opacity: 0.03;
+    transform: rotate(-15deg);
+    pointer-events: none;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    z-index: 1;
+}
+
+.wallet-pill {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.4rem 0.8rem;
+    border-radius: 12px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-main {
+    text-align: center;
+    z-index: 1;
+    padding: 1rem 0;
+}
+
+.volume-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.volume-amount {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1;
+    background: linear-gradient(180deg, #fff 0%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.whale .volume-amount {
+    background: linear-gradient(180deg, #fff 0%, #00f0ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+}
+
+.degen .volume-amount {
+    background: linear-gradient(180deg, #fff 0%, #F3BA2F 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(243, 186, 47, 0.3);
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1;
+    margin-top: auto;
+}
+
+.brand-tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.status-badges {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.badge.whale {
+    background: rgba(0, 240, 255, 0.1);
+    color: #00f0ff;
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
+}
+
+.badge.degen {
+    background: rgba(243, 186, 47, 0.1);
+    color: #F3BA2F;
+    border: 1px solid rgba(243, 186, 47, 0.2);
+    box-shadow: 0 0 10px rgba(243, 186, 47, 0.1);
+}
+
+.badge.chains {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+}

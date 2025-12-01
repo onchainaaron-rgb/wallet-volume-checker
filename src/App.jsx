@@ -1,13 +1,191 @@
-import VerificationModal from './components/VerificationModal'
+import { useState, useEffect } from 'react'
+import './App.css'
 import { Activity, Play, LogOut, User, History, Search, Trophy, List, CheckCircle, Twitter } from 'lucide-react'
-
-// ... (existing imports)
+import WalletInput from './components/WalletInput'
+import ChainSelector from './components/ChainSelector'
+import ResultsTable from './components/ResultsTable'
+import AuthModal from './components/AuthModal'
+import CookieConsent from './components/CookieConsent'
+import TelegramGateModal from './components/TelegramGateModal'
+import ScanHistory from './components/ScanHistory'
+import GlobalLeaderboard from './components/GlobalLeaderboard'
+import VerificationModal from './components/VerificationModal'
+import { fetchRealWalletData } from './utils/covalentService'
+import { fetchWalletData as fetchMockData } from './utils/mockDataService'
+import { supabase } from './supabaseClient'
 
 function App() {
-  // ... (existing state)
+  const [wallets, setWallets] = useState([])
+  const [selectedChains, setSelectedChains] = useState([])
+  const [results, setResults] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [useRealData, setUseRealData] = useState(true)
+  const [error, setError] = useState(null)
+
+  // Auth State
+  const [session, setSession] = useState(null)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false)
 
-  // ... (existing code)
+  // Telegram Gate State
+  const [searchCount, setSearchCount] = useState(0)
+  const [isTelegramGateOpen, setIsTelegramGateOpen] = useState(false)
+  const [isTelegramUnlocked, setIsTelegramUnlocked] = useState(false)
+
+  // View State
+  const [activeView, setActiveView] = useState('scan') // 'scan', 'my-scans', 'leaderboard'
+
+  useEffect(() => {
+    // Check active session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+
+    // Check local storage for Telegram unlock
+    const unlocked = localStorage.getItem('telegramGateUnlocked')
+    if (unlocked === 'true') {
+      setIsTelegramUnlocked(true)
+    }
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const handleUnlockTelegram = () => {
+    localStorage.setItem('telegramGateUnlocked', 'true')
+    setIsTelegramUnlocked(true)
+    setIsTelegramGateOpen(false)
+  }
+
+  // Debug State
+  const [debugLogs, setDebugLogs] = useState([])
+
+  const addLog = (msg) => {
+    const timestamp = new Date().toLocaleTimeString()
+    setDebugLogs(prev => [`[${timestamp}] ${msg}`, ...prev].slice(0, 50))
+    console.log(`[DEBUG] ${msg}`)
+  }
+
+  const saveScanToHistory = async (walletData) => {
+    if (!session) {
+      addLog("Skipping save: No active session")
+      return
+    }
+
+    addLog(`Saving scan for ${walletData.address}...`)
+    try {
+      const { error } = await supabase.from('scans').insert({
+        user_id: session.user.id,
+        wallet_address: walletData.address,
+        chains: selectedChains,
+        total_volume: walletData.totalVolume,
+        // Include verified status and handle if available in metadata
+        verified: true,
+        x_handle: session.user.user_metadata?.x_handle || null
+      })
+      if (error) {
+        addLog(`Error saving scan: ${error.message}`)
+        console.error('Error saving scan:', error)
+      } else {
+        addLog("Scan saved successfully to DB")
+      }
+    } catch (err) {
+      addLog(`Failed to save scan (Exception): ${err.message}`)
+      console.error('Failed to save scan:', err)
+    }
+  }
+
+  const handleAnalyze = async () => {
+    addLog("Analyze started")
+    setError(null)
+
+    // AUTH GATE
+    if (!session) {
+      addLog("Auth Gate: User not logged in")
+      setIsAuthModalOpen(true)
+      return
+    }
+
+    // TELEGRAM GATE (Trigger after 1st search if not unlocked)
+    if (searchCount >= 1 && !isTelegramUnlocked) {
+      addLog("Telegram Gate: Locked")
+      setIsTelegramGateOpen(true)
+      return
+    }
+
+    if (wallets.length === 0) {
+      setError("Please enter at least one wallet address.");
+      return;
+    }
+
+    if (selectedChains.length === 0) {
+      setError("Please select at least one chain.");
+      return;
+    }
+
+    setIsLoading(true)
+    setResults([])
+
+    const startTime = Date.now()
+
+    try {
+      const newResults = []
+      for (const wallet of wallets) {
+        addLog(`Fetching data for ${wallet} on ${selectedChains.length} chains...`)
+        let data;
+        if (useRealData) {
+          try {
+            data = await fetchRealWalletData(wallet, selectedChains)
+
+            // Display Backend Logs
+            if (data.debugLogs && data.debugLogs.length > 0) {
+              data.debugLogs.forEach(log => addLog(`[BACKEND] ${log}`));
+            }
+
+            addLog(`Data fetched: $${data.totalVolume?.toFixed(2)} volume`)
+          } catch (fetchErr) {
+            addLog(`Fetch failed: ${fetchErr.message}`)
+            throw fetchErr
+          }
+        } else {
+          data = await fetchMockData(wallet, selectedChains)
+        }
+        newResults.push(data)
+        setResults([...newResults])
+
+        // Auto-save to history
+        await saveScanToHistory(data)
+      }
+
+      const elapsed = Date.now() - startTime
+      if (elapsed < 1500) {
+        await new Promise(r => setTimeout(r, 1500 - elapsed))
+      }
+
+      // Increment search count on success
+      setSearchCount(prev => prev + 1)
+      addLog("Analysis complete")
+
+    } catch (error) {
+      addLog(`Analysis Error: ${error.message}`)
+      console.error("Error during analysis:", error);
+      setError(error.message || "An error occurred during analysis.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    setActiveView('scan')
+    addLog("User logged out")
+  }
 
   const handleVerificationComplete = (handle) => {
     // Update local session state to reflect change immediately
@@ -38,7 +216,6 @@ function App() {
       />
 
       <header className="main-header">
-        {/* ... (Logo) ... */}
         <div
           className="logo"
           onClick={() => setActiveView('scan')}
@@ -57,7 +234,6 @@ function App() {
 
           {session ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              {/* Verification Badge / Button */}
               {session.user.user_metadata?.id_verified ? (
                 <div style={{
                   display: 'flex',

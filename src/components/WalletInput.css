@@ -22,31 +22,6 @@
     gap: 0.5rem;
 }
 
-.action-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary);
-    padding: 0.4rem 0.8rem;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    transition: all 0.2s;
-}
-
-.action-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-primary);
-}
-
-.action-btn.danger:hover {
-    background: rgba(255, 50, 50, 0.1);
-    color: #ff4444;
-    border-color: #ff4444;
-}
-
 .wallet-textarea {
     min-height: 150px;
     resize: vertical;

@@ -49,30 +49,15 @@ export default function CookieConsent() {
             <div style={{ display: 'flex', gap: '1rem' }}>
                 <button
                     onClick={handleDecline}
-                    style={{
-                        background: 'transparent',
-                        border: '1px solid #555',
-                        color: '#aaa',
-                        padding: '0.5rem 1.5rem',
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        fontSize: '0.9rem'
-                    }}
+                    className="btn-secondary"
+                    style={{ fontSize: '0.9rem', padding: '0.5rem 1.5rem' }}
                 >
                     Decline
                 </button>
                 <button
                     onClick={handleAccept}
-                    style={{
-                        background: '#00f0ff',
-                        border: 'none',
-                        color: '#000',
-                        padding: '0.5rem 1.5rem',
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        fontWeight: '600',
-                        fontSize: '0.9rem'
-                    }}
+                    className="btn-primary"
+                    style={{ fontSize: '0.9rem', padding: '0.5rem 1.5rem' }}
                 >
                     Accept
                 </button>

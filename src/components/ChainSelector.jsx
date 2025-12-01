@@ -45,7 +45,7 @@ const ChainSelector = ({ onChainsChange }) => {
         <div className="glass-panel chain-selector-container">
             <div className="selector-header">
                 <h3><span className="text-accent">02.</span> Select Chains</h3>
-                <button className="action-btn" onClick={toggleAll}>
+                <button className="btn-secondary" onClick={toggleAll} style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}>
                     {selectedChains.length === AVAILABLE_CHAINS.length ? 'Deselect All' : 'Select All'}
                 </button>
             </div>

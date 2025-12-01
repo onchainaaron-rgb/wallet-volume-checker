@@ -139,7 +139,7 @@ export default function AuthModal({ isOpen, onClose }) {
                             color: '#000',
                             border: 'none',
                             padding: '0.875rem',
-                            borderRadius: '8px',
+                            borderRadius: '12px',
                             fontSize: '1rem',
                             fontWeight: '600',
                             cursor: loading ? 'wait' : 'pointer',
@@ -155,70 +155,36 @@ export default function AuthModal({ isOpen, onClose }) {
                         <button
                             onClick={() => setShowEmailInput(true)}
                             disabled={loading}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '0.75rem',
-                                background: '#333',
-                                color: '#fff',
-                                border: '1px solid #444',
-                                padding: '0.875rem',
-                                borderRadius: '8px',
-                                fontSize: '1rem',
-                                fontWeight: '600',
-                                cursor: loading ? 'wait' : 'pointer',
-                                opacity: loading ? 0.7 : 1
-                            }}
+                            className="btn-secondary"
+                            style={{ width: '100%', justifyContent: 'center', fontSize: '1rem', padding: '0.875rem' }}
                         >
                             <Mail size={20} />
                             Continue with Email
                         </button>
                     ) : (
-                        <form onSubmit={handleEmailLogin} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <form onSubmit={handleEmailLogin} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                             <input
                                 type="email"
                                 placeholder="Enter your email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                style={{
-                                    background: '#222',
-                                    border: '1px solid #444',
-                                    color: '#fff',
-                                    padding: '0.75rem',
-                                    borderRadius: '8px',
-                                    fontSize: '1rem',
-                                    outline: 'none'
-                                }}
+                                className="input-field"
+                                style={{ fontSize: '1rem', padding: '0.875rem' }}
                             />
                             <button
                                 type="submit"
                                 disabled={loading}
-                                style={{
-                                    background: '#00f0ff',
-                                    color: '#000',
-                                    border: 'none',
-                                    padding: '0.75rem',
-                                    borderRadius: '8px',
-                                    fontSize: '1rem',
-                                    fontWeight: '600',
-                                    cursor: loading ? 'wait' : 'pointer'
-                                }}
+                                className="btn-primary"
+                                style={{ width: '100%', justifyContent: 'center', fontSize: '1rem', padding: '0.875rem' }}
                             >
                                 {loading ? 'Sending...' : 'Send Magic Link'}
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setShowEmailInput(false)}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    color: '#666',
-                                    fontSize: '0.8rem',
-                                    cursor: 'pointer',
-                                    marginTop: '0.25rem'
-                                }}
+                                className="btn-secondary"
+                                style={{ width: '100%', justifyContent: 'center', fontSize: '0.9rem', padding: '0.5rem', border: 'none', background: 'transparent' }}
                             >
                                 Cancel
                             </button>

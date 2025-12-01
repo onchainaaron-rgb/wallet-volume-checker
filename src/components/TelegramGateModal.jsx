@@ -58,20 +58,14 @@ export default function TelegramGateModal({ isOpen, onUnlock }) {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     <button
                         onClick={handleJoin}
+                        className="btn-primary"
                         style={{
-                            display: 'flex',
-                            alignItems: 'center',
+                            width: '100%',
                             justifyContent: 'center',
-                            gap: '0.75rem',
-                            background: '#0088cc',
-                            color: '#fff',
-                            border: 'none',
-                            padding: '0.875rem',
-                            borderRadius: '8px',
                             fontSize: '1rem',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            transition: 'transform 0.1s'
+                            padding: '0.875rem',
+                            background: '#0088cc', // Keep Telegram Blue
+                            boxShadow: '0 4px 12px rgba(0, 136, 204, 0.3)'
                         }}
                     >
                         <Send size={20} />
@@ -80,14 +74,12 @@ export default function TelegramGateModal({ isOpen, onUnlock }) {
 
                     <button
                         onClick={handleContinue}
+                        className="btn-secondary"
                         style={{
-                            background: 'transparent',
-                            color: '#666',
-                            border: '1px solid #333',
-                            padding: '0.875rem',
-                            borderRadius: '8px',
+                            width: '100%',
+                            justifyContent: 'center',
                             fontSize: '0.9rem',
-                            cursor: 'pointer',
+                            padding: '0.875rem',
                             marginTop: '0.5rem'
                         }}
                     >

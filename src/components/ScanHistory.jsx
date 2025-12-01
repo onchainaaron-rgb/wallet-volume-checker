@@ -28,8 +28,20 @@ export default function ScanHistory({ session }) {
                 .order('created_at', { ascending: false })
 
             if (error) throw error
-            console.log("Fetched scans:", data);
-            setScans(data)
+
+            // Deduplicate: Keep only the most recent scan for each wallet
+            const uniqueScans = [];
+            const seenWallets = new Set();
+
+            for (const scan of data) {
+                if (!seenWallets.has(scan.wallet_address)) {
+                    seenWallets.add(scan.wallet_address);
+                    uniqueScans.push(scan);
+                }
+            }
+
+            console.log("Fetched unique scans:", uniqueScans);
+            setScans(uniqueScans)
         } catch (error) {
             console.error('Error fetching scans:', error)
             setError(error.message)

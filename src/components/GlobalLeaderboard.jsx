@@ -7,6 +7,7 @@ import './ResultsTable.css' // Reuse table styles
 const GlobalLeaderboard = () => {
     const [scans, setScans] = useState([])
     const [loading, setLoading] = useState(true)
+    const [searchTerm, setSearchTerm] = useState('')
 
     useEffect(() => {
         fetchLeaderboard()
@@ -54,15 +55,40 @@ const GlobalLeaderboard = () => {
         return `${address.slice(0, 6)}...${address.slice(-4)}`
     }
 
+    const filteredScans = scans.filter(scan =>
+        scan.wallet_address.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+
     return (
         <div className="glass-panel results-container">
-            <div className="results-header">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <Trophy className="text-accent" size={24} />
-                    <h3>Global Top 50 Wallets</h3>
+            <div className="results-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <Trophy className="text-accent" size={24} />
+                        <h3>Global Top 50 Wallets</h3>
+                    </div>
+                    <div className="results-meta">
+                        <span>Highest Volume Scans</span>
+                    </div>
                 </div>
-                <div className="results-meta">
-                    <span>Highest Volume Scans</span>
+
+                {/* Search Bar */}
+                <div style={{ width: '100%' }}>
+                    <input
+                        type="text"
+                        placeholder="Search wallet address..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        style={{
+                            width: '100%',
+                            padding: '0.6rem 1rem',
+                            borderRadius: '8px',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            background: 'rgba(0, 0, 0, 0.2)',
+                            color: '#fff',
+                            fontSize: '0.9rem'
+                        }}
+                    />
                 </div>
             </div>
 
@@ -78,7 +104,7 @@ const GlobalLeaderboard = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {scans.map((scan, idx) => (
+                        {filteredScans.map((scan, idx) => (
                             <tr key={scan.id} className="result-row">
                                 <td className="mono" style={{ color: idx < 3 ? 'var(--accent-primary)' : 'var(--text-secondary)', fontWeight: idx < 3 ? 'bold' : 'normal' }}>
                                     #{idx + 1}
@@ -114,6 +140,13 @@ const GlobalLeaderboard = () => {
                                     <div className="loading-indicator">
                                         <span className="dot"></span> Loading Leaderboard...
                                     </div>
+                                </td>
+                            </tr>
+                        )}
+                        {!loading && filteredScans.length === 0 && (
+                            <tr>
+                                <td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>
+                                    No wallets found matching "{searchTerm}"
                                 </td>
                             </tr>
                         )}

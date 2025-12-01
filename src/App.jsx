@@ -1,186 +1,22 @@
-import { useState, useEffect } from 'react'
-import './App.css'
-import { Activity, Play, LogOut, User, History, Search, Trophy, List } from 'lucide-react'
-import WalletInput from './components/WalletInput'
-import ChainSelector from './components/ChainSelector'
-import ResultsTable from './components/ResultsTable'
-import AuthModal from './components/AuthModal'
-import CookieConsent from './components/CookieConsent'
-import TelegramGateModal from './components/TelegramGateModal'
-import ScanHistory from './components/ScanHistory'
-import GlobalLeaderboard from './components/GlobalLeaderboard'
-import { fetchRealWalletData } from './utils/covalentService'
-import { fetchWalletData as fetchMockData } from './utils/mockDataService'
-import { supabase } from './supabaseClient'
+import VerificationModal from './components/VerificationModal'
+import { Activity, Play, LogOut, User, History, Search, Trophy, List, CheckCircle, Twitter } from 'lucide-react'
+
+// ... (existing imports)
 
 function App() {
-  const [wallets, setWallets] = useState([])
-  const [selectedChains, setSelectedChains] = useState([])
-  const [results, setResults] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [useRealData, setUseRealData] = useState(true)
-  const [error, setError] = useState(null)
+  // ... (existing state)
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false)
 
-  // Auth State
-  const [session, setSession] = useState(null)
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  // ... (existing code)
 
-  // Telegram Gate State
-  const [searchCount, setSearchCount] = useState(0)
-  const [isTelegramGateOpen, setIsTelegramGateOpen] = useState(false)
-  const [isTelegramUnlocked, setIsTelegramUnlocked] = useState(false)
-
-  // View State
-  const [activeView, setActiveView] = useState('scan') // 'scan', 'my-scans', 'leaderboard'
-
-  useEffect(() => {
-    // Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-    })
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
-
-    // Check local storage for Telegram unlock
-    const unlocked = localStorage.getItem('telegramGateUnlocked')
-    if (unlocked === 'true') {
-      setIsTelegramUnlocked(true)
+  const handleVerificationComplete = (handle) => {
+    // Update local session state to reflect change immediately
+    if (session) {
+      const newSession = { ...session }
+      newSession.user.user_metadata.x_handle = handle
+      newSession.user.user_metadata.id_verified = true
+      setSession(newSession)
     }
-
-    return () => subscription.unsubscribe()
-  }, [])
-
-  const handleUnlockTelegram = () => {
-    localStorage.setItem('telegramGateUnlocked', 'true')
-    setIsTelegramUnlocked(true)
-    setIsTelegramGateOpen(false)
-  }
-
-  // Debug State
-  const [debugLogs, setDebugLogs] = useState([])
-  // const [isDebugOpen, setIsDebugOpen] = useState(false) // Removed debug panel
-
-  const addLog = (msg) => {
-    const timestamp = new Date().toLocaleTimeString()
-    setDebugLogs(prev => [`[${timestamp}] ${msg}`, ...prev].slice(0, 50))
-    console.log(`[DEBUG] ${msg}`)
-  }
-
-  const saveScanToHistory = async (walletData) => {
-    if (!session) {
-      addLog("Skipping save: No active session")
-      return
-    }
-
-    addLog(`Saving scan for ${walletData.address}...`)
-    try {
-      const { error } = await supabase.from('scans').insert({
-        user_id: session.user.id,
-        wallet_address: walletData.address,
-        chains: selectedChains,
-        total_volume: walletData.totalVolume
-      })
-      if (error) {
-        addLog(`Error saving scan: ${error.message}`)
-        console.error('Error saving scan:', error)
-      } else {
-        addLog("Scan saved successfully to DB")
-      }
-    } catch (err) {
-      addLog(`Failed to save scan (Exception): ${err.message}`)
-      console.error('Failed to save scan:', err)
-    }
-  }
-
-  const handleAnalyze = async () => {
-    addLog("Analyze started")
-    setError(null)
-
-    // AUTH GATE
-    if (!session) {
-      addLog("Auth Gate: User not logged in")
-      setIsAuthModalOpen(true)
-      return
-    }
-
-    // TELEGRAM GATE (Trigger after 1st search if not unlocked)
-    if (searchCount >= 1 && !isTelegramUnlocked) {
-      addLog("Telegram Gate: Locked")
-      setIsTelegramGateOpen(true)
-      return
-    }
-
-    if (wallets.length === 0) {
-      setError("Please enter at least one wallet address.");
-      return;
-    }
-
-    if (selectedChains.length === 0) {
-      setError("Please select at least one chain.");
-      return;
-    }
-
-    setIsLoading(true)
-    setResults([])
-
-    const startTime = Date.now()
-
-    try {
-      const newResults = []
-      for (const wallet of wallets) {
-        addLog(`Fetching data for ${wallet} on ${selectedChains.length} chains...`)
-        let data;
-        if (useRealData) {
-          try {
-            data = await fetchRealWalletData(wallet, selectedChains)
-
-            // Display Backend Logs
-            if (data.debugLogs && data.debugLogs.length > 0) {
-              data.debugLogs.forEach(log => addLog(`[BACKEND] ${log}`));
-            }
-
-            addLog(`Data fetched: $${data.totalVolume?.toFixed(2)} volume`)
-          } catch (fetchErr) {
-            addLog(`Fetch failed: ${fetchErr.message}`)
-            throw fetchErr
-          }
-        } else {
-          data = await fetchMockData(wallet, selectedChains)
-        }
-        newResults.push(data)
-        setResults([...newResults])
-
-        // Auto-save to history
-        await saveScanToHistory(data)
-      }
-
-      const elapsed = Date.now() - startTime
-      if (elapsed < 1500) {
-        await new Promise(r => setTimeout(r, 1500 - elapsed))
-      }
-
-      // Increment search count on success
-      setSearchCount(prev => prev + 1)
-      addLog("Analysis complete")
-
-    } catch (error) {
-      addLog(`Analysis Error: ${error.message}`)
-      console.error("Error during analysis:", error);
-      setError(error.message || "An error occurred during analysis.")
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    setActiveView('scan')
-    addLog("User logged out")
   }
 
   return (
@@ -190,12 +26,19 @@ function App() {
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
       />
+      <VerificationModal
+        isOpen={isVerificationModalOpen}
+        onClose={() => setIsVerificationModalOpen(false)}
+        session={session}
+        onVerificationComplete={handleVerificationComplete}
+      />
       <TelegramGateModal
         isOpen={isTelegramGateOpen}
         onUnlock={handleUnlockTelegram}
       />
 
       <header className="main-header">
+        {/* ... (Logo) ... */}
         <div
           className="logo"
           onClick={() => setActiveView('scan')}
@@ -214,6 +57,39 @@ function App() {
 
           {session ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              {/* Verification Badge / Button */}
+              {session.user.user_metadata?.id_verified ? (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  background: 'rgba(29, 161, 242, 0.1)',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '20px',
+                  border: '1px solid rgba(29, 161, 242, 0.2)'
+                }}>
+                  <Twitter size={14} color="#1DA1F2" />
+                  <span style={{ color: '#1DA1F2', fontSize: '0.85rem', fontWeight: '600' }}>
+                    @{session.user.user_metadata.x_handle}
+                  </span>
+                  <CheckCircle size={14} color="#1DA1F2" />
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsVerificationModalOpen(true)}
+                  className="btn-secondary"
+                  style={{
+                    fontSize: '0.85rem',
+                    padding: '0.5rem 1rem',
+                    borderColor: '#1DA1F2',
+                    color: '#1DA1F2'
+                  }}
+                >
+                  <Twitter size={14} style={{ marginRight: '0.5rem' }} />
+                  Verify ID
+                </button>
+              )}
+
               <button
                 onClick={() => setActiveView('scan')}
                 className={`nav-btn ${activeView === 'scan' ? 'active' : ''}`}

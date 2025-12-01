@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
-import { Trophy, Wallet, Layers } from 'lucide-react'
+import { Trophy, Wallet, Layers, Twitter } from 'lucide-react'
 import AirdropBadge from './AirdropBadge'
 import './ResultsTable.css'
 import './FlexCards.css'
@@ -122,6 +122,11 @@ const GlobalLeaderboard = () => {
                                         {scan.verified && (
                                             <span style={{ color: '#10b981', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                                                 <Layers size={12} /> Verified
+                                            </span>
+                                        )}
+                                        {scan.x_handle && (
+                                            <span style={{ color: '#1DA1F2', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                                <Twitter size={12} /> @{scan.x_handle}
                                             </span>
                                         )}
                                     </div>

@@ -226,6 +226,9 @@ function App() {
             <div className="hero-section">
               <h1 className="hero-title">Lifetime Volume <span className="text-gradient">Checker</span></h1>
               <p className="hero-subtitle">Analyze cross-chain transaction history for any wallet address.</p>
+              <p style={{ marginTop: '1rem', color: '#00f0ff', fontSize: '1rem', fontWeight: '600' }}>
+                Track your wallet now and see where you rank on the Global Leaderboard! 🏆
+              </p>
             </div>
 
             <div className="grid-layout">

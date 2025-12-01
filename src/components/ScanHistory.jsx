@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
-import { ArrowUpRight, Calendar, DollarSign, Wallet } from 'lucide-react'
+import { Wallet, Calendar, Layers } from 'lucide-react'
+import './ResultsTable.css' // Reuse the card styles
 
 export default function ScanHistory({ session }) {
     const [scans, setScans] = useState([])
@@ -13,6 +14,7 @@ export default function ScanHistory({ session }) {
     }, [session])
 
     const fetchScans = async () => {
+        console.log("Fetching scans for user:", session.user.id);
         try {
             const { data, error } = await supabase
                 .from('scans')
@@ -21,12 +23,21 @@ export default function ScanHistory({ session }) {
                 .order('created_at', { ascending: false })
 
             if (error) throw error
+            console.log("Fetched scans:", data);
             setScans(data)
         } catch (error) {
             console.error('Error fetching scans:', error)
         } finally {
             setLoading(false)
         }
+    }
+
+    const formatCurrency = (val) => {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            maximumFractionDigits: 0
+        }).format(val)
     }
 
     if (loading) return <div className="text-center p-4">Loading history...</div>
@@ -40,62 +51,39 @@ export default function ScanHistory({ session }) {
     }
 
     return (
-        <div className="glass-panel">
-            <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <ActivityIcon /> Scan History
-                <span style={{ fontSize: '0.8rem', background: '#333', padding: '0.2rem 0.5rem', borderRadius: '4px', color: '#888' }}>
-                    {scans.length} Total
-                </span>
-            </h3>
+        <div className="cards-container">
+            {scans.map((scan) => (
+                <div key={scan.id} className="result-card">
+                    <div className="card-header">
+                        <div className="wallet-info">
+                            <Wallet size={16} className="text-secondary" />
+                            <span className="mono">{scan.wallet_address}</span>
+                        </div>
+                        <div className="scan-date" style={{ fontSize: '0.8rem', color: '#666', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <Calendar size={14} />
+                            {new Date(scan.created_at).toLocaleDateString()}
+                        </div>
+                    </div>
 
-            <div className="table-container">
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                        <tr style={{ borderBottom: '1px solid #333', textAlign: 'left' }}>
-                            <th style={{ padding: '1rem', color: '#888', fontWeight: '500' }}>Wallet</th>
-                            <th style={{ padding: '1rem', color: '#888', fontWeight: '500' }}>Date</th>
-                            <th style={{ padding: '1rem', color: '#888', fontWeight: '500', textAlign: 'right' }}>Total Volume</th>
-                            <th style={{ padding: '1rem', color: '#888', fontWeight: '500', textAlign: 'right' }}>Potential</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {scans.map((scan) => (
-                            <tr key={scan.id} style={{ borderBottom: '1px solid #222' }}>
-                                <td style={{ padding: '1rem', fontFamily: 'monospace' }}>
-                                    {scan.wallet_address.slice(0, 6)}...{scan.wallet_address.slice(-4)}
-                                </td>
-                                <td style={{ padding: '1rem', color: '#666', fontSize: '0.9rem' }}>
-                                    {new Date(scan.created_at).toLocaleDateString()}
-                                </td>
-                                <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 'bold', color: '#fff' }}>
-                                    ${Number(scan.total_volume).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                </td>
-                                <td style={{ padding: '1rem', textAlign: 'right' }}>
-                                    {Number(scan.total_volume) > 10000 ? (
-                                        <span style={{ color: '#00f0ff', background: 'rgba(0, 240, 255, 0.1)', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem' }}>
-                                            HIGH
-                                        </span>
-                                    ) : Number(scan.total_volume) > 1000 ? (
-                                        <span style={{ color: '#f3ba2f', background: 'rgba(243, 186, 47, 0.1)', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem' }}>
-                                            MEDIUM
-                                        </span>
-                                    ) : (
-                                        <span style={{ color: '#666', fontSize: '0.8rem' }}>LOW</span>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                    <div className="card-body">
+                        <div className="total-volume-section">
+                            <span className="label">Total Volume</span>
+                            <div className="total-value text-gradient">{formatCurrency(scan.total_volume)}</div>
+                        </div>
+
+                        <div className="chain-grid">
+                            {/* We only stored the list of chains, not the breakdown per chain in the DB for now. 
+                                If we want breakdown, we need to update the DB schema to store it. 
+                                For now, we show the chains that were scanned. */}
+                            {Array.isArray(scan.chains) && scan.chains.map(chain => (
+                                <div key={chain} className="chain-item">
+                                    <span className="chain-name">{chain}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            ))}
         </div>
-    )
-}
-
-function ActivityIcon() {
-    return (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-        </svg>
     )
 }

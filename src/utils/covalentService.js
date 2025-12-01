@@ -16,7 +16,9 @@ const CHAIN_MAP = {
     'fantom': '250'
 };
 
-const BACKEND_URL = '/api/volume';
+const BACKEND_URL = import.meta.env.DEV
+    ? 'https://volumescan.xyz/api/volume'
+    : '/api/volume';
 
 export const fetchRealWalletData = async (wallet, chains) => {
     const results = {};

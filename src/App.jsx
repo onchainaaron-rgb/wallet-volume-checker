@@ -260,7 +260,7 @@ function App() {
 
             {results.length > 0 && (
               <div className="results-section">
-                <ResultsTable results={results} />
+                <ResultsTable results={results} selectedChains={selectedChains} />
               </div>
             )}
           </>

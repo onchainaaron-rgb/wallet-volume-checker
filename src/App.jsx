@@ -342,7 +342,7 @@ function App() {
       </main>
 
       <footer style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)', fontSize: '0.8rem', borderTop: '1px solid var(--border-color)', marginTop: 'auto' }}>
-        <p>VolumeScan.xyz &copy; {new Date().getFullYear()} • v1.1 (Blue Chip Update)</p>
+        <p>VolumeScan.xyz &copy; {new Date().getFullYear()} • v1.2 (Build {new Date().toLocaleTimeString()})</p>
       </footer>
     </div>
   )

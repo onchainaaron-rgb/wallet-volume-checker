@@ -62,9 +62,23 @@ function App() {
     setIsTelegramGateOpen(false)
   }
 
-  const saveScanToHistory = async (walletData) => {
-    if (!session) return
+  // Debug State
+  const [debugLogs, setDebugLogs] = useState([])
+  const [isDebugOpen, setIsDebugOpen] = useState(false)
 
+  const addLog = (msg) => {
+    const timestamp = new Date().toLocaleTimeString()
+    setDebugLogs(prev => [`[${timestamp}] ${msg}`, ...prev].slice(0, 50))
+    console.log(`[DEBUG] ${msg}`)
+  }
+
+  const saveScanToHistory = async (walletData) => {
+    if (!session) {
+      addLog("Skipping save: No active session")
+      return
+    }
+
+    addLog(`Saving scan for ${walletData.wallet}...`)
     try {
       const { error } = await supabase.from('scans').insert({
         user_id: session.user.id,
@@ -72,24 +86,32 @@ function App() {
         chains: selectedChains,
         total_volume: walletData.totalVolume
       })
-      if (error) console.error('Error saving scan:', error)
+      if (error) {
+        addLog(`Error saving scan: ${error.message}`)
+        console.error('Error saving scan:', error)
+      } else {
+        addLog("Scan saved successfully to DB")
+      }
     } catch (err) {
+      addLog(`Failed to save scan (Exception): ${err.message}`)
       console.error('Failed to save scan:', err)
     }
   }
 
   const handleAnalyze = async () => {
-    console.log("Analyze clicked. Session:", !!session);
+    addLog("Analyze started")
     setError(null)
 
     // AUTH GATE
     if (!session) {
+      addLog("Auth Gate: User not logged in")
       setIsAuthModalOpen(true)
       return
     }
 
     // TELEGRAM GATE (Trigger after 1st search if not unlocked)
     if (searchCount >= 1 && !isTelegramUnlocked) {
+      addLog("Telegram Gate: Locked")
       setIsTelegramGateOpen(true)
       return
     }
@@ -112,9 +134,16 @@ function App() {
     try {
       const newResults = []
       for (const wallet of wallets) {
+        addLog(`Fetching data for ${wallet} on ${selectedChains.length} chains...`)
         let data;
         if (useRealData) {
-          data = await fetchRealWalletData(wallet, selectedChains)
+          try {
+            data = await fetchRealWalletData(wallet, selectedChains)
+            addLog(`Data fetched: $${data.totalVolume?.toFixed(2)} volume`)
+          } catch (fetchErr) {
+            addLog(`Fetch failed: ${fetchErr.message}`)
+            throw fetchErr
+          }
         } else {
           data = await fetchMockData(wallet, selectedChains)
         }
@@ -132,8 +161,10 @@ function App() {
 
       // Increment search count on success
       setSearchCount(prev => prev + 1)
+      addLog("Analysis complete")
 
     } catch (error) {
+      addLog(`Analysis Error: ${error.message}`)
       console.error("Error during analysis:", error);
       setError(error.message || "An error occurred during analysis.")
     } finally {
@@ -144,6 +175,7 @@ function App() {
   const handleLogout = async () => {
     await supabase.auth.signOut()
     setActiveView('scan')
+    addLog("User logged out")
   }
 
   return (
@@ -306,6 +338,53 @@ function App() {
           </div>
         )}
       </main>
+
+      {/* DEBUG PANEL TOGGLE */}
+      <div style={{ position: 'fixed', bottom: '1rem', right: '1rem', zIndex: 9999 }}>
+        <button
+          onClick={() => setIsDebugOpen(!isDebugOpen)}
+          style={{
+            background: '#333',
+            color: '#fff',
+            border: '1px solid #555',
+            padding: '0.5rem',
+            borderRadius: '4px',
+            fontSize: '0.8rem',
+            cursor: 'pointer'
+          }}
+        >
+          {isDebugOpen ? 'Hide Debug' : 'Show Debug'}
+        </button>
+      </div>
+
+      {/* DEBUG PANEL */}
+      {isDebugOpen && (
+        <div style={{
+          position: 'fixed',
+          bottom: '4rem',
+          right: '1rem',
+          width: '400px',
+          height: '300px',
+          background: 'rgba(0,0,0,0.9)',
+          border: '1px solid #555',
+          borderRadius: '8px',
+          padding: '1rem',
+          overflowY: 'auto',
+          zIndex: 9999,
+          fontFamily: 'monospace',
+          fontSize: '0.8rem',
+          color: '#0f0'
+        }}>
+          <h4 style={{ color: '#fff', marginTop: 0, borderBottom: '1px solid #333', paddingBottom: '0.5rem' }}>Debug Logs</h4>
+          {debugLogs.length === 0 ? (
+            <p style={{ color: '#666' }}>No logs yet...</p>
+          ) : (
+            debugLogs.map((log, i) => (
+              <div key={i} style={{ marginBottom: '0.25rem' }}>{log}</div>
+            ))
+          )}
+        </div>
+      )}
     </div>
   )
 }

@@ -18,10 +18,23 @@ const GlobalLeaderboard = () => {
                 .from('scans')
                 .select('*')
                 .order('total_volume', { ascending: false })
-                .limit(50)
+                .limit(200) // Fetch more to allow for duplicates
 
             if (error) throw error
-            setScans(data)
+
+            // Deduplicate by wallet_address
+            const uniqueWallets = [];
+            const seenAddresses = new Set();
+
+            for (const scan of data) {
+                if (!seenAddresses.has(scan.wallet_address)) {
+                    seenAddresses.add(scan.wallet_address);
+                    uniqueWallets.push(scan);
+                }
+                if (uniqueWallets.length >= 50) break;
+            }
+
+            setScans(uniqueWallets)
         } catch (error) {
             console.error('Error fetching leaderboard:', error)
         } finally {

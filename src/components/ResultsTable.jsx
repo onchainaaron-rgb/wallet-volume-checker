@@ -1,4 +1,4 @@
-import { ArrowRight, Plus } from 'lucide-react'
+import { ArrowRight, Wallet, Layers } from 'lucide-react'
 import AirdropBadge from './AirdropBadge'
 import './ResultsTable.css'
 
@@ -14,7 +14,7 @@ const ResultsTable = ({ results, isLoading, selectedChains }) => {
     }
 
     return (
-        <div className="glass-panel results-container">
+        <div className="results-container">
             <div className="results-header">
                 <h3><span className="text-accent">03.</span> Analysis Results</h3>
                 <div className="results-meta">
@@ -22,48 +22,54 @@ const ResultsTable = ({ results, isLoading, selectedChains }) => {
                 </div>
             </div>
 
-            <div className="table-responsive">
-                <table className="results-table">
-                    <thead>
-                        <tr>
-                            <th>Wallet Address</th>
-                            {selectedChains.map(chain => (
-                                <th key={chain} className="chain-col">{chain.toUpperCase()}</th>
-                            ))}
-                            <th className="total-col">TOTAL VOL</th>
-                            <th>AIRDROP EST.</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {results.map((row, idx) => (
-                            <tr key={`${row.address}-${idx}`} className="result-row">
-                                <td className="wallet-col">
+            <div className="cards-container">
+                {results.map((row, idx) => {
+                    // Filter chains with > 0 volume
+                    const activeChains = selectedChains.filter(chain => (row.chainVolumes[chain] || 0) > 0);
+
+                    return (
+                        <div key={`${row.address}-${idx}`} className="result-card">
+                            <div className="card-header">
+                                <div className="wallet-info">
+                                    <Wallet size={16} className="text-secondary" />
                                     <span className="mono">{row.address}</span>
-                                </td>
-                                {selectedChains.map(chain => (
-                                    <td key={chain} className="mono">
-                                        {formatCurrency(row.chainVolumes[chain] || 0)}
-                                    </td>
-                                ))}
-                                <td className="total-col mono text-accent">
-                                    {formatCurrency(row.totalVolume)}
-                                </td>
-                                <td>
-                                    <AirdropBadge potential={row.airdropPotential} />
-                                </td>
-                            </tr>
-                        ))}
-                        {isLoading && (
-                            <tr className="loading-row">
-                                <td colSpan={selectedChains.length + 3}>
-                                    <div className="loading-indicator">
-                                        <span className="dot"></span> Scanning Blockchain Data...
+                                </div>
+                                <AirdropBadge potential={row.airdropPotential} />
+                            </div>
+
+                            <div className="card-body">
+                                <div className="total-volume-section">
+                                    <span className="label">Total Volume</span>
+                                    <div className="total-value text-gradient">{formatCurrency(row.totalVolume)}</div>
+                                </div>
+
+                                {activeChains.length > 0 ? (
+                                    <div className="chain-grid">
+                                        {activeChains.map(chain => (
+                                            <div key={chain} className="chain-item">
+                                                <span className="chain-name">{chain}</span>
+                                                <span className="chain-value">{formatCurrency(row.chainVolumes[chain])}</span>
+                                            </div>
+                                        ))}
                                     </div>
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                                ) : (
+                                    <div className="no-activity">
+                                        <Layers size={24} />
+                                        <span>No activity found on selected chains</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )
+                })}
+
+                {isLoading && (
+                    <div className="result-card loading-card">
+                        <div className="loading-indicator">
+                            <span className="dot"></span> Scanning Blockchain Data...
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     )

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
-import { Wallet, Calendar, Layers } from 'lucide-react'
+import { Wallet, Calendar, Layers, Trash2 } from 'lucide-react'
 import './ResultsTable.css'
 import './FlexCards.css'
 
@@ -49,6 +49,25 @@ export default function ScanHistory({ session }) {
             setLoading(false)
         }
     }
+
+    const handleDelete = async (scanId, e) => {
+        e.stopPropagation();
+        if (!window.confirm('Are you sure you want to delete this scan?')) return;
+
+        try {
+            const { error } = await supabase
+                .from('scans')
+                .delete()
+                .eq('id', scanId);
+
+            if (error) throw error;
+
+            setScans(scans.filter(scan => scan.id !== scanId));
+        } catch (error) {
+            console.error('Error deleting scan:', error);
+            alert('Failed to delete scan');
+        }
+    };
 
     const formatCurrency = (val) => {
         return new Intl.NumberFormat('en-US', {
@@ -158,9 +177,23 @@ export default function ScanHistory({ session }) {
                                                 <Layers size={12} /> Verified
                                             </span>
                                         )}
-                                        <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)' }}>
-                                            {new Date(scan.created_at).toLocaleDateString()}
-                                        </div>
+                                        <button
+                                            onClick={(e) => handleDelete(scan.id, e)}
+                                            style={{
+                                                background: 'rgba(239, 68, 68, 0.1)',
+                                                border: '1px solid rgba(239, 68, 68, 0.2)',
+                                                color: '#ef4444',
+                                                padding: '4px',
+                                                borderRadius: '6px',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }}
+                                            title="Delete Scan"
+                                        >
+                                            <Trash2 size={12} />
+                                        </button>
                                     </div>
                                 </div>
 

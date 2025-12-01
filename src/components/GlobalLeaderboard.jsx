@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
-import { Trophy } from 'lucide-react'
+import { Trophy, Wallet, Layers } from 'lucide-react'
 import AirdropBadge from './AirdropBadge'
 import './ResultsTable.css'
+import './FlexCards.css'
 
 const GlobalLeaderboard = () => {
     const [scans, setScans] = useState([])
@@ -52,102 +53,100 @@ const GlobalLeaderboard = () => {
         }).format(val)
     }
 
-    const formatAddress = (address) => {
-        return `${address.slice(0, 6)}...${address.slice(-4)}`
-    }
-
     const filteredScans = scans.filter(scan =>
         scan.verified && // Only show verified
         scan.wallet_address.toLowerCase().includes(searchTerm.toLowerCase())
     )
 
     return (
-        <div className="glass-panel results-container">
-            <div className="results-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <Trophy className="text-accent" size={24} />
-                        <h3>Global Top 50 Wallets</h3>
-                    </div>
-                    <div className="results-meta">
-                        <span>Highest Volume Scans</span>
-                    </div>
-                </div>
-
-                <div style={{ width: '100%' }}>
+        <div className="scan-history-container">
+            <div className="controls-bar" style={{
+                display: 'flex',
+                gap: '1rem',
+                marginBottom: '1.5rem',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                background: 'rgba(255, 255, 255, 0.03)',
+                padding: '1rem',
+                borderRadius: '12px',
+                border: '1px solid rgba(255, 255, 255, 0.05)'
+            }}>
+                <div style={{ flex: 1, minWidth: '200px' }}>
                     <input
                         type="text"
                         placeholder="Search wallet address..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="input-field"
+                        className="input-field control-bar-item"
                     />
                 </div>
             </div>
 
-            <div className="table-responsive">
-                <table className="results-table">
-                    <thead>
-                        <tr>
-                            <th>Rank</th>
-                            <th>Wallet Address</th>
-                            <th className="total-col">TOTAL VOL</th>
-                            <th>AIRDROP EST.</th>
-                            <th>STATUS</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredScans.map((scan, idx) => (
-                            <tr key={scan.id} className="result-row">
-                                <td className="mono" style={{ color: idx < 3 ? 'var(--accent-primary)' : 'var(--text-secondary)', fontWeight: idx < 3 ? 'bold' : 'normal' }}>
-                                    #{idx + 1}
-                                </td>
-                                <td className="wallet-col">
-                                    <span className="mono" title={scan.wallet_address}>
-                                        {formatAddress(scan.wallet_address)}
-                                    </span>
-                                </td>
-                                <td className="total-col mono text-accent">
-                                    {formatCurrency(scan.total_volume)}
-                                </td>
-                                <td>
-                                    <AirdropBadge potential={scan.total_volume > 250000 ? { label: 'High', color: '#00f0ff' } : { label: 'Medium', color: '#F3BA2F' }} />
-                                </td>
-                                <td>
-                                    {scan.verified && (
+            {loading ? (
+                <div className="glass-panel" style={{ textAlign: 'center', padding: '3rem' }}>
+                    <div className="loading-indicator">
+                        <span className="dot"></span> Loading Leaderboard...
+                    </div>
+                </div>
+            ) : filteredScans.length === 0 ? (
+                <div className="text-center p-4" style={{ color: '#888' }}>No wallets found.</div>
+            ) : (
+                <div className="flex-card-grid">
+                    {filteredScans.map((scan, idx) => {
+                        const isWhale = scan.total_volume > 100000;
+                        const isDegen = scan.total_volume > 10000 && scan.total_volume <= 100000;
+                        const cardClass = isWhale ? 'flex-card whale' : isDegen ? 'flex-card degen' : 'flex-card';
+
+                        // Rank Badge Color
+                        let rankColor = '#64748b'; // default slate
+                        if (idx === 0) rankColor = '#fbbf24'; // gold
+                        if (idx === 1) rankColor = '#94a3b8'; // silver
+                        if (idx === 2) rankColor = '#b45309'; // bronze
+
+                        return (
+                            <div key={scan.id} className={cardClass}>
+                                <div className="card-watermark">#{idx + 1}</div>
+
+                                <div className="card-top">
+                                    <div className="wallet-pill">
                                         <span style={{
-                                            color: '#10b981',
-                                            fontSize: '0.7rem',
-                                            background: 'rgba(16, 185, 129, 0.1)',
-                                            padding: '2px 6px',
-                                            borderRadius: '4px',
-                                            border: '1px solid rgba(16, 185, 129, 0.2)'
-                                        }}>
-                                            VERIFIED
-                                        </span>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                        {loading && (
-                            <tr className="loading-row">
-                                <td colSpan={5}>
-                                    <div className="loading-indicator">
-                                        <span className="dot"></span> Loading Leaderboard...
+                                            marginRight: '0.5rem',
+                                            color: rankColor,
+                                            fontWeight: 'bold',
+                                            fontSize: '0.9rem'
+                                        }}>#{idx + 1}</span>
+                                        <Wallet size={12} />
+                                        {scan.wallet_address.slice(0, 6)}...{scan.wallet_address.slice(-4)}
                                     </div>
-                                </td>
-                            </tr>
-                        )}
-                        {!loading && filteredScans.length === 0 && (
-                            <tr>
-                                <td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>
-                                    No wallets found matching "{searchTerm}"
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
+                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                        {scan.verified && (
+                                            <span style={{ color: '#10b981', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                                <Layers size={12} /> Verified
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="card-main">
+                                    <div className="volume-label">Total Volume</div>
+                                    <div className="volume-amount">
+                                        {formatCurrency(scan.total_volume)}
+                                    </div>
+                                </div>
+
+                                <div className="card-footer">
+                                    <div className="brand-tag">VolumeScan</div>
+                                    <div className="status-badges">
+                                        {isWhale && <span className="badge whale">WHALE</span>}
+                                        {isDegen && <span className="badge degen">DEGEN</span>}
+                                        <AirdropBadge potential={scan.total_volume > 250000 ? { label: 'High', color: '#00f0ff' } : { label: 'Medium', color: '#F3BA2F' }} />
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+            )}
         </div>
     )
 }

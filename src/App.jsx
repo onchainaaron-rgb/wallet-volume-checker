@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import { Activity, Play, LogOut, User } from 'lucide-react'
+import { Activity, Play, LogOut, User, History, Search } from 'lucide-react'
 import WalletInput from './components/WalletInput'
 import ChainSelector from './components/ChainSelector'
 import ResultsTable from './components/ResultsTable'
 import AuthModal from './components/AuthModal'
 import CookieConsent from './components/CookieConsent'
 import TelegramGateModal from './components/TelegramGateModal'
+import ScanHistory from './components/ScanHistory'
 import { fetchRealWalletData } from './utils/covalentService'
 import { fetchWalletData as fetchMockData } from './utils/mockDataService'
 import { supabase } from './supabaseClient'
@@ -27,6 +28,9 @@ function App() {
   const [searchCount, setSearchCount] = useState(0)
   const [isTelegramGateOpen, setIsTelegramGateOpen] = useState(false)
   const [isTelegramUnlocked, setIsTelegramUnlocked] = useState(false)
+
+  // View State
+  const [activeView, setActiveView] = useState('scan') // 'scan' or 'history'
 
   useEffect(() => {
     // Check active session
@@ -54,9 +58,22 @@ function App() {
     localStorage.setItem('telegramGateUnlocked', 'true')
     setIsTelegramUnlocked(true)
     setIsTelegramGateOpen(false)
-    // Automatically trigger the analysis that was blocked?
-    // For simplicity, user just clicks "Start Analysis" again or we could trigger it.
-    // Let's just close the modal and let them click again to avoid complexity with stale state.
+  }
+
+  const saveScanToHistory = async (walletData) => {
+    if (!session) return
+
+    try {
+      const { error } = await supabase.from('scans').insert({
+        user_id: session.user.id,
+        wallet_address: walletData.wallet,
+        chains: selectedChains,
+        total_volume: walletData.totalVolume
+      })
+      if (error) console.error('Error saving scan:', error)
+    } catch (err) {
+      console.error('Failed to save scan:', err)
+    }
   }
 
   const handleAnalyze = async () => {
@@ -101,6 +118,9 @@ function App() {
         }
         newResults.push(data)
         setResults([...newResults])
+
+        // Save to history
+        await saveScanToHistory(data)
       }
 
       const elapsed = Date.now() - startTime
@@ -121,6 +141,7 @@ function App() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
+    setActiveView('scan')
   }
 
   return (
@@ -137,41 +158,33 @@ function App() {
 
       <header className="main-header">
         <div className="logo">
-          <Activity className="icon-accent" />
-          <span>VOLUME<span className="text-accent">SCAN</span></span>
+          <Activity className="logo-icon" />
+          <h1>VolumeScan<span className="text-accent">.xyz</span></h1>
         </div>
-
         <div className="header-controls" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <button
-            className="mode-toggle"
-            onClick={() => setUseRealData(!useRealData)}
-            style={{
-              background: 'transparent',
-              border: '1px solid var(--border-color)',
-              color: useRealData ? 'var(--text-accent)' : 'var(--text-secondary)',
-              padding: '0.5rem 1rem',
-              borderRadius: '6px',
-              fontSize: '0.8rem',
-              cursor: 'pointer',
-              fontFamily: 'var(--font-mono)'
-            }}
-          >
-            {useRealData ? 'REAL DATA' : 'MOCK DATA'}
-          </button>
-
           {session ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem' }}>
+              <button
+                onClick={() => setActiveView('scan')}
+                className={activeView === 'scan' ? 'nav-btn active' : 'nav-btn'}
+                style={{ background: 'none', border: 'none', color: activeView === 'scan' ? '#00f0ff' : '#666', cursor: 'pointer', display: 'flex', gap: '0.5rem', alignItems: 'center' }}
+              >
+                <Search size={18} /> Scan
+              </button>
+              <button
+                onClick={() => setActiveView('history')}
+                className={activeView === 'history' ? 'nav-btn active' : 'nav-btn'}
+                style={{ background: 'none', border: 'none', color: activeView === 'history' ? '#00f0ff' : '#666', cursor: 'pointer', display: 'flex', gap: '0.5rem', alignItems: 'center' }}
+              >
+                <History size={18} /> History
+              </button>
+              <div className="user-badge">
                 {session.user.user_metadata.avatar_url ? (
-                  <img
-                    src={session.user.user_metadata.avatar_url}
-                    alt="Avatar"
-                    style={{ width: 24, height: 24, borderRadius: '50%' }}
-                  />
+                  <img src={session.user.user_metadata.avatar_url} alt="User" style={{ width: 24, height: 24, borderRadius: '50%' }} />
                 ) : (
-                  <User size={20} />
+                  <User size={18} />
                 )}
-                <span className="text-accent">{session.user.user_metadata.full_name || session.user.email}</span>
+                <span>{session.user.user_metadata.full_name || session.user.email?.split('@')[0]}</span>
               </div>
               <button
                 onClick={handleLogout}
@@ -193,63 +206,57 @@ function App() {
         </div>
       </header>
 
-      <main className="container">
-        <div className="hero-section">
-          <h1 className="hero-title">Lifetime Volume <span className="text-gradient">Checker</span></h1>
-          <p className="hero-subtitle">Analyze cross-chain transaction history for any wallet address.</p>
-        </div>
+      <main className="main-content">
+        {activeView === 'scan' ? (
+          <>
+            <div className="hero-section">
+              <h2>Check Your <span className="text-accent">Airdrop Eligibility</span></h2>
+              <p>Analyze your wallet volume across multiple chains instantly.</p>
+            </div>
 
-        <div className="grid-layout">
-          <WalletInput onWalletsChange={setWallets} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <ChainSelector onChainsChange={setSelectedChains} />
+            <div className="input-section">
+              <WalletInput onWalletsChange={setWallets} />
+              <ChainSelector onChainsChange={setSelectedChains} />
 
-            {error && (
-              <div style={{
-                background: 'rgba(255, 50, 50, 0.1)',
-                border: '1px solid #ff4444',
-                color: '#ff4444',
-                padding: '1rem',
-                borderRadius: '8px',
-                fontSize: '0.9rem'
-              }}>
-                <strong>Error:</strong> {error}
+              <div className="action-area">
+                <button
+                  className={`analyze-btn ${isLoading ? 'loading' : ''}`}
+                  onClick={handleAnalyze}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="spinner"></div>
+                      Scanning Chains...
+                    </>
+                  ) : (
+                    <>
+                      <Play size={20} />
+                      Start Volume Analysis
+                    </>
+                  )}
+                </button>
+                {error && <div className="error-message">{error}</div>}
+              </div>
+            </div>
+
+            {results.length > 0 && (
+              <div className="results-section">
+                <ResultsTable results={results} />
               </div>
             )}
-
-            <button
-              className="btn-primary"
-              onClick={handleAnalyze}
-              style={{
-                cursor: isLoading ? 'wait' : 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                fontSize: '1.1rem',
-                padding: '1rem',
-                opacity: isLoading ? 0.7 : 1,
-                zIndex: 1000,
-                position: 'relative'
-              }}
-            >
-              {isLoading ? 'SCANNING...' : <><Play size={20} fill="currentColor" /> START ANALYSIS</>}
-            </button>
+          </>
+        ) : (
+          <div className="history-section" style={{ maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
+            <div className="hero-section">
+              <h2>Your <span className="text-accent">Scan History</span></h2>
+              <p>Track your past analyses and identify high-potential wallets.</p>
+            </div>
+            <ScanHistory session={session} />
           </div>
-        </div>
-
-        <ResultsTable
-          results={results}
-          isLoading={isLoading}
-          selectedChains={selectedChains}
-        />
-
+        )}
       </main>
-
-      <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-        v1.2 - Secure & Linked
-      </div>
-    </div >
+    </div>
   )
 }
 

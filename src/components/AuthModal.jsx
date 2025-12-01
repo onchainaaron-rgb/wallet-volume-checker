@@ -76,25 +76,25 @@ export default function AuthModal({ isOpen, onClose }) {
                     maxWidth: '400px',
                     textAlign: 'center',
                     cursor: 'default',
-                    background: 'rgba(10, 10, 10, 0.9)',
-                    border: '1px solid var(--border-color)',
-                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+                    background: '#0a0a0a',
+                    border: '1px solid #333',
+                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)'
                 }}
             >
                 <div style={{ marginBottom: '1.5rem' }}>
                     <div style={{
-                        background: 'rgba(16, 185, 129, 0.1)',
+                        background: 'rgba(220, 38, 38, 0.1)',
                         width: '64px',
                         height: '64px',
                         borderRadius: '50%',
-                        border: '1px solid rgba(16, 185, 129, 0.2)',
+                        border: '1px solid rgba(220, 38, 38, 0.2)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         margin: '0 auto 1rem',
-                        boxShadow: '0 0 20px rgba(16, 185, 129, 0.1)'
+                        boxShadow: '0 0 20px rgba(220, 38, 38, 0.1)'
                     }}>
-                        <ShieldCheck size={32} color="#10b981" />
+                        <ShieldCheck size={32} color="#DC2626" />
                     </div>
                     <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', color: '#fff', fontFamily: 'var(--font-header)', fontWeight: '700' }}>Access Required</h2>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', fontFamily: 'var(--font-body)', lineHeight: '1.5' }}>
@@ -169,7 +169,10 @@ export default function AuthModal({ isOpen, onClose }) {
                                 gap: '0.5rem',
                                 fontSize: '1rem',
                                 padding: '0.875rem',
-                                fontFamily: 'var(--font-header)'
+                                fontFamily: 'var(--font-header)',
+                                background: 'transparent',
+                                border: '1px solid #333',
+                                color: '#fff'
                             }}
                         >
                             <Mail size={20} />
@@ -187,7 +190,11 @@ export default function AuthModal({ isOpen, onClose }) {
                                 style={{
                                     fontSize: '1rem',
                                     padding: '0.875rem',
-                                    fontFamily: 'var(--font-body)'
+                                    fontFamily: 'var(--font-body)',
+                                    background: '#111',
+                                    border: '1px solid #333',
+                                    color: '#fff',
+                                    borderRadius: '8px'
                                 }}
                             />
                             <button
@@ -200,7 +207,10 @@ export default function AuthModal({ isOpen, onClose }) {
                                     fontSize: '1rem',
                                     padding: '0.875rem',
                                     fontFamily: 'var(--font-header)',
-                                    color: '#000'
+                                    color: '#fff',
+                                    background: '#DC2626',
+                                    border: 'none',
+                                    borderRadius: '8px'
                                 }}
                             >
                                 {loading ? 'Sending...' : 'Send Magic Link'}

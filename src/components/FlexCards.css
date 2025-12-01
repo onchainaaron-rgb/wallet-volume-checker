@@ -1,182 +1,71 @@
-/* Flex Card Styles - Sleek Alpha Aesthetic */
-.flex-card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1.5rem;
-}
-
-.flex-card {
-    position: relative;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 1.5rem;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 220px;
-    backdrop-filter: blur(10px);
-}
-
-.flex-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--border-highlight);
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-}
-
-/* Whale Card Variant */
-.flex-card.whale {
-    background: linear-gradient(145deg, rgba(0, 240, 255, 0.05) 0%, rgba(10, 10, 10, 0.8) 100%);
-    border-color: rgba(0, 240, 255, 0.2);
-}
-
-.flex-card.whale:hover {
-    box-shadow: 0 0 30px rgba(0, 240, 255, 0.1);
-}
-
-/* Degen Card Variant */
-.flex-card.degen {
-    background: linear-gradient(145deg, rgba(243, 186, 47, 0.05) 0%, rgba(10, 10, 10, 0.8) 100%);
-    border-color: rgba(243, 186, 47, 0.2);
-}
-
-.flex-card.degen:hover {
-    box-shadow: 0 0 30px rgba(243, 186, 47, 0.1);
-}
-
-.card-watermark {
-    position: absolute;
-    bottom: -20px;
-    right: -20px;
-    font-size: 8rem;
-    opacity: 0.02;
-    transform: rotate(-15deg);
-    pointer-events: none;
-    font-family: var(--font-header);
-    color: #fff;
-    font-weight: 800;
-}
-
-.card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-    z-index: 1;
-}
-
-.wallet-pill {
-    background: rgba(0, 0, 0, 0.4);
-    padding: 0.4rem 0.8rem;
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.card-main {
-    text-align: center;
-    z-index: 1;
-    padding: 1rem 0;
-}
-
-.volume-label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: var(--text-muted);
-    margin-bottom: 0.5rem;
-    font-family: var(--font-header);
-}
-
-.volume-amount {
-    font-size: 3rem;
-    font-weight: 700;
-    line-height: 1;
-    color: #fff;
-    font-family: var(--font-header);
-    background: linear-gradient(180deg, #fff 0%, #94a3b8 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.whale .volume-amount {
-    background: linear-gradient(180deg, #fff 0%, #00f0ff 100%);
-    -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.3));
-}
+    }
 
-.degen .volume-amount {
-    background: linear-gradient(180deg, #fff 0%, #F3BA2F 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 10px rgba(243, 186, 47, 0.3));
-}
+    .degen .volume-amount {
+        background: linear-gradient(180deg, #fff 0%, #F3BA2F 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 10px rgba(243, 186, 47, 0.3));
+    }
 
-.card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 1;
-    margin-top: auto;
-    border-top: 1px solid var(--border-color);
-    padding-top: 1rem;
-}
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 1;
+        margin-top: auto;
+        border-top: 1px solid var(--border-color);
+        padding-top: 1rem;
+    }
 
-.brand-tag {
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-family: var(--font-header);
-}
+    .brand-tag {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-family: var(--font-header);
+    }
 
-.status-badges {
-    display: flex;
-    gap: 0.5rem;
-}
+    .status-badges {
+        display: flex;
+        gap: 0.5rem;
+    }
 
-.badge {
-    font-size: 0.65rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-family: var(--font-header);
-    border: 1px solid transparent;
-}
+    .badge {
+        font-size: 0.65rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-family: var(--font-header);
+        border: 1px solid transparent;
+    }
 
-.badge.whale {
-    background: rgba(0, 240, 255, 0.1);
-    color: #00f0ff;
-    border-color: rgba(0, 240, 255, 0.2);
-    box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
-}
+    .badge.whale {
+        background: rgba(0, 240, 255, 0.1);
+        color: #00f0ff;
+        border-color: rgba(0, 240, 255, 0.2);
+        box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
+    }
 
-.badge.degen {
-    background: rgba(243, 186, 47, 0.1);
-    color: #F3BA2F;
-    border-color: rgba(243, 186, 47, 0.2);
-    box-shadow: 0 0 10px rgba(243, 186, 47, 0.1);
-}
+    .badge.degen {
+        background: rgba(243, 186, 47, 0.1);
+        color: #F3BA2F;
+        border-color: rgba(243, 186, 47, 0.2);
+        box-shadow: 0 0 10px rgba(243, 186, 47, 0.1);
+    }
 
-.badge.chains {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.2s;
-}
+    .badge.chains {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
 
-.badge.chains:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-}
+    .badge.chains:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+    }

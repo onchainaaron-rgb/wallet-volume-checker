@@ -5,52 +5,49 @@
   --bg-card: #ffffff;
   --bg-card-hover: #fff9c4;
   /* Light Yellow hover */
-
-  --text-primary: #000000;
-  --text-secondary: #444444;
-  --text-muted: #666666;
-
-  /* Vibrant Accents */
-  --accent-primary: #ff0055;
-  /* Sleek Alpha / Top G Palette */
-  --bg-dark: #0a0a0a;
-  --bg-card: rgba(255, 255, 255, 0.03);
-  --bg-glass: rgba(20, 20, 20, 0.6);
+  /* Red & Black / Dark Mode Palette */
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-card: rgba(20, 20, 20, 0.95);
+  --bg-glass: rgba(20, 20, 20, 0.8);
 
   --text-primary: #ffffff;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-secondary: #9ca3af;
+  --text-muted: #525252;
 
-  /* Accents */
-  --accent-gold: #F3BA2F;
-  --accent-platinum: #E2E8F0;
-  --accent-blue: #00f0ff;
-  --accent-danger: #ef4444;
-  --accent-success: #10b981;
+  /* Accents - Bold Red */
+  --accent-primary: #DC2626;
+  /* Red-600 */
+  --accent-secondary: #EF4444;
+  /* Red-500 */
+  --accent-glow: rgba(220, 38, 38, 0.5);
 
-  /* Borders & Glows */
-  --border-color: rgba(255, 255, 255, 0.1);
-  --border-highlight: rgba(255, 255, 255, 0.2);
-  --glow-gold: 0 0 20px rgba(243, 186, 47, 0.15);
-  --glow-blue: 0 0 20px rgba(0, 240, 255, 0.15);
+  --border-color: #333333;
+  --border-focus: #DC2626;
+
+  --success: #10b981;
+  --error: #ef4444;
 
   /* Typography */
   --font-header: 'Space Grotesk', sans-serif;
   --font-body: 'Outfit', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+
+  /* Spacing & Layout */
+  --max-width: 1200px;
+  --header-height: 80px;
+  --border-radius: 12px;
 }
 
 body {
   margin: 0;
   padding: 0;
-  font-family: var(--font-body);
-  background-color: var(--bg-dark);
-  background-image:
-    radial-gradient(circle at 50% 0%, rgba(243, 186, 47, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 80% 10%, rgba(0, 240, 255, 0.05) 0%, transparent 30%);
+  background-color: var(--bg-primary);
   color: var(--text-primary);
-  min-height: 100vh;
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 /* Scrollbar */
@@ -59,7 +56,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-dark);
+  background: var(--bg-primary);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -68,42 +65,49 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #444;
+  background: var(--accent-primary);
 }
 
-/* Utilities */
-.text-gradient-gold {
-  background: linear-gradient(135deg, #FFF 0%, #F3BA2F 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.text-gradient-platinum {
-  background: linear-gradient(135deg, #FFF 0%, #94a3b8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
+/* Glassmorphism Utilities */
 .glass-panel {
   background: var(--bg-card);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #F3BA2F 0%, #d97706 100%);
-  color: #000;
-  font-family: var(--font-header);
-  font-weight: 700;
+.glass-button {
+  background: var(--accent-primary);
+  color: white;
   border: none;
-  border-radius: 8px;
-  padding: 0.75rem 1.5rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  box-shadow: 0 4px 15px rgba(243, 186, 47, 0.3);
+  letter-spacing: 0.5px;
+  font-weight: 700;
+}
+
+.glass-button:hover {
+  background: var(--accent-secondary);
+  box-shadow: 0 0 15px var(--accent-glow);
+  transform: translateY(-1px);
+}
+
+/* Text Gradients (Red/White) */
+.text-gradient {
+  background: linear-gradient(to right, #fff, #ccc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-gradient-red {
+  background: linear-gradient(to right, #EF4444, #DC2626);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .btn-primary:hover {

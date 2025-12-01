@@ -201,3 +201,59 @@
   background: rgba(59, 130, 246, 0.08);
   border-color: rgba(59, 130, 246, 0.2);
 }
+
+.btn-verify {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-verify:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #fff;
+}
+
+@media (max-width: 768px) {
+  .main-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem 0.5rem;
+    /* Reduced horizontal padding */
+    width: 100%;
+    overflow-x: hidden;
+    /* Prevent horizontal scroll */
+  }
+
+  .header-controls {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem !important;
+    padding: 0 0.25rem;
+    /* Ensure buttons don't touch edges */
+  }
+
+  .nav-btn span,
+  .btn-verify span,
+  .user-badge span {
+    display: none;
+  }
+
+  .nav-btn,
+  .btn-verify,
+  .user-badge {
+    padding: 0.6rem;
+    justify-content: center;
+    flex-shrink: 0;
+    /* Prevent buttons from squishing */
+  }
+}

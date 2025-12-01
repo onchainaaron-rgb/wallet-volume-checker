@@ -229,14 +229,14 @@ function App() {
           style={{ cursor: 'pointer' }}
         >
           <Activity className="logo-icon" />
-          <h1>VolumeScan<span className="text-accent">.xyz</span></h1>
+          <h1>Volume Daddy<span className="text-accent">.xyz</span></h1>
         </div>
         <div className="header-controls" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <button
             onClick={() => setActiveView('leaderboard')}
             className={`nav-btn ${activeView === 'leaderboard' ? 'active' : ''}`}
           >
-            <Trophy size={18} /> Leaderboard
+            <Trophy size={18} /> Volume Daddies
           </button>
 
           {session ? (
@@ -244,36 +244,19 @@ function App() {
               {session.user.user_metadata?.id_verified ? (
                 <button
                   onClick={() => setIsVerificationModalOpen(true)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    padding: '0.5rem 1rem',
-                    borderRadius: '20px',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    cursor: 'pointer',
-                    color: 'inherit'
-                  }}>
-                  <XLogo size={14} color="#fff" />
-                  <span style={{ color: '#fff', fontSize: '0.85rem', fontWeight: '600' }}>
-                    @{session.user.user_metadata.x_handle}
-                  </span>
-                  <CheckCircle size={14} color="#1DA1F2" />
+                  className="btn-verify"
+                >
+                  <XLogo size={16} color="#fff" />
+                  <span>@{session.user.user_metadata.x_handle}</span>
+                  <CheckCircle size={16} color="#1DA1F2" />
                 </button>
               ) : (
                 <button
                   onClick={() => setIsVerificationModalOpen(true)}
-                  className="btn-secondary"
-                  style={{
-                    fontSize: '0.85rem',
-                    padding: '0.5rem 1rem',
-                    borderColor: '#fff',
-                    color: '#fff'
-                  }}
+                  className="btn-verify"
                 >
-                  <XLogo size={14} style={{ marginRight: '0.5rem' }} />
-                  Verify ID
+                  <XLogo size={16} />
+                  <span>Verify ID</span>
                 </button>
               )}
 
@@ -287,7 +270,7 @@ function App() {
                 onClick={() => setActiveView('my-scans')}
                 className={`nav-btn ${activeView === 'my-scans' ? 'active' : ''}`}
               >
-                <List size={18} /> My Scans
+                <List size={18} /> My Alpha
               </button>
               <div className="user-badge">
                 {session.user.user_metadata.avatar_url ? (
@@ -321,10 +304,10 @@ function App() {
         {activeView === 'scan' && (
           <>
             <div className="hero-section">
-              <h1 className="hero-title">Lifetime Volume <span className="text-gradient">Checker</span></h1>
-              <p className="hero-subtitle">Analyze cross-chain transaction history for any wallet address.</p>
-              <p style={{ marginTop: '1rem', color: '#00f0ff', fontSize: '1rem', fontWeight: '600' }}>
-                Track your wallet now and see where you rank on the Global Leaderboard! 🏆
+              <h1 className="hero-title">How Heavy Are <span className="text-gradient">Your Bags?</span></h1>
+              <p className="hero-subtitle">Check your Daddy Status across all chains.</p>
+              <p style={{ marginTop: '1rem', color: '#fbbf24', fontSize: '1rem', fontWeight: '600' }}>
+                See if you're a Volume Daddy or just a shrimp. 🦐 vs 🐳
               </p>
             </div>
 
@@ -386,7 +369,7 @@ function App() {
         {activeView === 'my-scans' && (
           <div className="history-section" style={{ maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
             <div className="hero-section">
-              <h1 className="hero-title">My <span className="text-gradient">Scans</span></h1>
+              <h1 className="hero-title">My <span className="text-gradient">Alpha</span></h1>
               <p className="hero-subtitle">Track your past analyses and identify high-potential wallets.</p>
             </div>
             <ScanHistory session={session} />
@@ -396,8 +379,8 @@ function App() {
         {activeView === 'leaderboard' && (
           <div className="history-section" style={{ maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
             <div className="hero-section">
-              <h1 className="hero-title">Global <span className="text-gradient">Leaderboard</span></h1>
-              <p className="hero-subtitle">Top wallets by volume across all users.</p>
+              <h1 className="hero-title">Volume <span className="text-gradient">Daddies</span></h1>
+              <p className="hero-subtitle">Top Gs by volume across all users.</p>
             </div>
             <GlobalLeaderboard />
           </div>
@@ -405,7 +388,7 @@ function App() {
       </main>
 
       <footer style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)', fontSize: '0.8rem', borderTop: '1px solid var(--border-color)', marginTop: 'auto' }}>
-        <p>VolumeScan.xyz &copy; {new Date().getFullYear()} • v1.2 (Build {new Date().toLocaleTimeString()})</p>
+        <p>Volume Daddy &copy; {new Date().getFullYear()} • v1.2 (Build {new Date().toLocaleTimeString()})</p>
       </footer>
     </div>
   )

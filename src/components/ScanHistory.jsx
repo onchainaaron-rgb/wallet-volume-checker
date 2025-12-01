@@ -211,7 +211,7 @@ export default function ScanHistory({ session }) {
                                 </div>
 
                                 <div className="card-footer">
-                                    <div className="brand-tag">VolumeScan</div>
+                                    <div className="brand-tag">Volume Daddy</div>
                                     <div className="status-badges">
                                         {isWhale && <span className="badge whale">WHALE</span>}
                                         {isDegen && <span className="badge degen">DEGEN</span>}

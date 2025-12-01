@@ -5,7 +5,7 @@ export default function TelegramGateModal({ isOpen, onUnlock }) {
 
     const handleJoin = () => {
         // Open Telegram link in new tab
-        window.open('https://t.me/volumescanxyz', '_blank')
+        window.open('https://t.me/volumedaddy', '_blank')
     }
 
     const handleContinue = () => {

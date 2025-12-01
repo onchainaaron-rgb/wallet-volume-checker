@@ -306,7 +306,7 @@ function App() {
             <div className="hero-section">
               <h1 className="hero-title">How Heavy Are <span className="text-gradient">Your Bags?</span></h1>
               <p className="hero-subtitle">Check your Daddy Status across all chains.</p>
-              <p style={{ marginTop: '1rem', color: '#fbbf24', fontSize: '1rem', fontWeight: '600' }}>
+              <p style={{ marginTop: '1rem', color: '#000000', fontSize: '1rem', fontWeight: '600' }}>
                 See if you're a Volume Daddy or just a shrimp. 🦐 vs 🐳
               </p>
             </div>
@@ -387,8 +387,8 @@ function App() {
         )}
       </main>
 
-      <footer style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)', fontSize: '0.8rem', borderTop: '1px solid var(--border-color)', marginTop: 'auto' }}>
-        <p>Volume Daddy &copy; {new Date().getFullYear()} • v1.2 (Build {new Date().toLocaleTimeString()})</p>
+      <footer style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)', fontSize: '1rem', borderTop: 'var(--border-width) solid var(--border-color)', marginTop: 'auto', fontFamily: 'var(--font-mono)' }}>
+        <p>Volume Daddy &copy; {new Date().getFullYear()} • v1.4 (Build {new Date().toLocaleTimeString()})</p>
       </footer>
     </div>
   )

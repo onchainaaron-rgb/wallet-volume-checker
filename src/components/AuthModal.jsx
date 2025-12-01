@@ -58,8 +58,8 @@ export default function AuthModal({ isOpen, onClose }) {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.85)',
-                backdropFilter: 'blur(8px)',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                backdropFilter: 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -69,45 +69,48 @@ export default function AuthModal({ isOpen, onClose }) {
         >
             <div
                 onClick={(e) => e.stopPropagation()}
+                className="glass-panel"
                 style={{
-                    background: '#1a1b1e',
-                    border: '1px solid #333',
-                    borderRadius: '16px',
                     padding: '2rem',
                     width: '100%',
                     maxWidth: '400px',
                     textAlign: 'center',
-                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-                    cursor: 'default'
+                    cursor: 'default',
+                    background: 'rgba(10, 10, 10, 0.9)',
+                    border: '1px solid var(--border-color)',
+                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
                 }}
             >
                 <div style={{ marginBottom: '1.5rem' }}>
                     <div style={{
-                        background: 'rgba(0, 240, 255, 0.1)',
+                        background: 'rgba(16, 185, 129, 0.1)',
                         width: '64px',
                         height: '64px',
                         borderRadius: '50%',
+                        border: '1px solid rgba(16, 185, 129, 0.2)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        margin: '0 auto 1rem'
+                        margin: '0 auto 1rem',
+                        boxShadow: '0 0 20px rgba(16, 185, 129, 0.1)'
                     }}>
-                        <ShieldCheck size={32} color="#00f0ff" />
+                        <ShieldCheck size={32} color="#10b981" />
                     </div>
-                    <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', color: '#fff' }}>Access Required</h2>
-                    <p style={{ color: '#888', fontSize: '0.9rem' }}>
+                    <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', color: '#fff', fontFamily: 'var(--font-header)', fontWeight: '700' }}>Access Required</h2>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', fontFamily: 'var(--font-body)', lineHeight: '1.5' }}>
                         Sign in to unlock detailed volume analysis and qualify for future airdrops.
                     </p>
                 </div>
 
                 {error && (
                     <div style={{
-                        background: 'rgba(255, 50, 50, 0.1)',
-                        color: '#ff4444',
+                        background: 'rgba(239, 68, 68, 0.1)',
+                        color: '#ef4444',
                         padding: '0.75rem',
                         borderRadius: '8px',
                         fontSize: '0.85rem',
-                        marginBottom: '1rem'
+                        marginBottom: '1rem',
+                        border: '1px solid rgba(239, 68, 68, 0.2)'
                     }}>
                         {error}
                     </div>
@@ -115,12 +118,13 @@ export default function AuthModal({ isOpen, onClose }) {
 
                 {message && (
                     <div style={{
-                        background: 'rgba(0, 255, 100, 0.1)',
-                        color: '#4ade80',
+                        background: 'rgba(16, 185, 129, 0.1)',
+                        color: '#10b981',
                         padding: '0.75rem',
                         borderRadius: '8px',
                         fontSize: '0.85rem',
-                        marginBottom: '1rem'
+                        marginBottom: '1rem',
+                        border: '1px solid rgba(16, 185, 129, 0.2)'
                     }}>
                         {message}
                     </div>
@@ -139,12 +143,13 @@ export default function AuthModal({ isOpen, onClose }) {
                             color: '#000',
                             border: 'none',
                             padding: '0.875rem',
-                            borderRadius: '12px',
+                            borderRadius: '8px',
                             fontSize: '1rem',
                             fontWeight: '600',
                             cursor: loading ? 'wait' : 'pointer',
                             opacity: loading ? 0.7 : 1,
-                            transition: 'transform 0.1s'
+                            transition: 'all 0.2s',
+                            fontFamily: 'var(--font-header)'
                         }}
                     >
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="20" alt="Google" />
@@ -156,7 +161,16 @@ export default function AuthModal({ isOpen, onClose }) {
                             onClick={() => setShowEmailInput(true)}
                             disabled={loading}
                             className="btn-secondary"
-                            style={{ width: '100%', justifyContent: 'center', fontSize: '1rem', padding: '0.875rem' }}
+                            style={{
+                                width: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '0.5rem',
+                                fontSize: '1rem',
+                                padding: '0.875rem',
+                                fontFamily: 'var(--font-header)'
+                            }}
                         >
                             <Mail size={20} />
                             Continue with Email
@@ -170,13 +184,24 @@ export default function AuthModal({ isOpen, onClose }) {
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                                 className="input-field"
-                                style={{ fontSize: '1rem', padding: '0.875rem' }}
+                                style={{
+                                    fontSize: '1rem',
+                                    padding: '0.875rem',
+                                    fontFamily: 'var(--font-body)'
+                                }}
                             />
                             <button
                                 type="submit"
                                 disabled={loading}
                                 className="btn-primary"
-                                style={{ width: '100%', justifyContent: 'center', fontSize: '1rem', padding: '0.875rem' }}
+                                style={{
+                                    width: '100%',
+                                    justifyContent: 'center',
+                                    fontSize: '1rem',
+                                    padding: '0.875rem',
+                                    fontFamily: 'var(--font-header)',
+                                    color: '#000'
+                                }}
                             >
                                 {loading ? 'Sending...' : 'Send Magic Link'}
                             </button>
@@ -184,7 +209,17 @@ export default function AuthModal({ isOpen, onClose }) {
                                 type="button"
                                 onClick={() => setShowEmailInput(false)}
                                 className="btn-secondary"
-                                style={{ width: '100%', justifyContent: 'center', fontSize: '0.9rem', padding: '0.5rem', border: 'none', background: 'transparent' }}
+                                style={{
+                                    width: '100%',
+                                    justifyContent: 'center',
+                                    fontSize: '0.9rem',
+                                    padding: '0.5rem',
+                                    border: 'none',
+                                    background: 'transparent',
+                                    fontFamily: 'var(--font-body)',
+                                    color: 'var(--text-secondary)',
+                                    textDecoration: 'none'
+                                }}
                             >
                                 Cancel
                             </button>
@@ -192,7 +227,7 @@ export default function AuthModal({ isOpen, onClose }) {
                     )}
                 </div>
 
-                <p style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: '#555', lineHeight: '1.4' }}>
+                <p style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: '1.4', fontFamily: 'var(--font-body)' }}>
                     By continuing, you agree to our Terms of Service and Privacy Policy.
                     <br />
                     <span style={{ opacity: 0.7 }}>

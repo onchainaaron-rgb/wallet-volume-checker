@@ -59,8 +59,8 @@ export default function VerificationModal({ isOpen, onClose, session, onVerifica
                 left: 0,
                 right: 0,
                 bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.85)',
-                backdropFilter: 'blur(8px)',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                backdropFilter: 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -71,14 +71,14 @@ export default function VerificationModal({ isOpen, onClose, session, onVerifica
             <div
                 onClick={(e) => e.stopPropagation()}
                 style={{
-                    background: '#1a1b1e',
-                    border: '1px solid #333',
-                    borderRadius: '16px',
+                    background: '#ffffff',
+                    border: '3px solid #000',
+                    borderRadius: '0',
                     padding: '2rem',
                     width: '100%',
                     maxWidth: '400px',
                     textAlign: 'center',
-                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+                    boxShadow: '8px 8px 0px #000',
                     position: 'relative'
                 }}
             >
@@ -90,31 +90,33 @@ export default function VerificationModal({ isOpen, onClose, session, onVerifica
                         right: '1rem',
                         background: 'none',
                         border: 'none',
-                        color: '#666',
+                        color: '#000',
                         cursor: 'pointer'
                     }}
                 >
-                    <X size={20} />
+                    <X size={24} />
                 </button>
 
                 {session?.user?.user_metadata?.id_verified ? (
                     <div style={{ textAlign: 'center' }}>
                         <div style={{ marginBottom: '1.5rem' }}>
                             <div style={{
-                                background: 'rgba(255, 255, 255, 0.1)',
+                                background: '#f0fdf4',
                                 width: '64px',
                                 height: '64px',
-                                borderRadius: '50%',
+                                borderRadius: '0',
+                                border: '3px solid #000',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                margin: '0 auto 1rem'
+                                margin: '0 auto 1rem',
+                                boxShadow: '4px 4px 0px #000'
                             }}>
-                                <ShieldCheck size={32} color="#10b981" />
+                                <ShieldCheck size={32} color="#000" />
                             </div>
-                            <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', color: '#fff' }}>ID Verified</h2>
-                            <p style={{ color: '#888', fontSize: '0.9rem' }}>
-                                Connected as <span style={{ color: '#fff', fontWeight: 'bold' }}>@{session.user.user_metadata.x_handle}</span>
+                            <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', color: '#000', fontFamily: 'var(--font-header)' }}>ID Verified</h2>
+                            <p style={{ color: '#444', fontSize: '0.9rem', fontFamily: 'var(--font-mono)' }}>
+                                Connected as <span style={{ color: '#000', fontWeight: 'bold' }}>@{session.user.user_metadata.x_handle}</span>
                             </p>
                         </div>
 
@@ -163,20 +165,21 @@ export default function VerificationModal({ isOpen, onClose, session, onVerifica
                     <>
                         <div style={{ marginBottom: '1.5rem' }}>
                             <div style={{
-                                background: 'rgba(255, 255, 255, 0.1)',
+                                background: '#000',
                                 width: '64px',
                                 height: '64px',
-                                borderRadius: '50%',
+                                borderRadius: '0',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                margin: '0 auto 1rem'
+                                margin: '0 auto 1rem',
+                                boxShadow: '4px 4px 0px rgba(0,0,0,0.2)'
                             }}>
                                 <XLogo size={32} color="#fff" />
                             </div>
-                            <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', color: '#fff' }}>Verify ID with X</h2>
-                            <p style={{ color: '#888', fontSize: '0.9rem' }}>
-                                Link your X account to get the <span style={{ color: '#fff' }}>ID Verified</span> badge on the leaderboard.
+                            <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', color: '#000', fontFamily: 'var(--font-header)' }}>Verify ID with X</h2>
+                            <p style={{ color: '#444', fontSize: '0.9rem', fontFamily: 'var(--font-mono)' }}>
+                                Link your X account to get the <span style={{ color: '#000', fontWeight: 'bold' }}>ID Verified</span> badge.
                             </p>
                         </div>
 
@@ -215,9 +218,12 @@ export default function VerificationModal({ isOpen, onClose, session, onVerifica
                                     width: '100%',
                                     justifyContent: 'center',
                                     padding: '0.875rem',
-                                    background: '#fff',
-                                    color: '#000',
-                                    border: 'none'
+                                    background: '#000',
+                                    color: '#fff',
+                                    border: '3px solid #000',
+                                    borderRadius: '0',
+                                    fontFamily: 'var(--font-header)',
+                                    fontSize: '0.8rem'
                                 }}
                             >
                                 {loading ? 'Verifying...' : 'Link Account'}

@@ -1,6 +1,5 @@
 .app-container {
   min-height: 100vh;
-  /* Background handled in index.css */
 }
 
 .main-header {
@@ -8,12 +7,12 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  border-bottom: var(--border-width) solid var(--border-color);
-  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(12px);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 4px 0px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
@@ -23,80 +22,38 @@
   color: var(--text-primary);
   font-family: var(--font-header);
   text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .logo h1 {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   margin: 0;
-  line-height: 1;
+  font-weight: 700;
 }
 
 .logo-icon {
-  color: var(--accent-primary);
+  color: var(--accent-gold);
   width: 32px;
   height: 32px;
-}
-
-.icon-accent {
-  color: var(--accent-primary);
-}
-
-.text-accent {
-  color: var(--accent-primary);
-}
-
-.status-badge {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--success);
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  padding: 0.25rem 0.75rem;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 500;
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  background: var(--success);
-  border-radius: 50%;
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.4;
-  }
-
-  100% {
-    opacity: 1;
-  }
+  filter: drop-shadow(0 0 8px rgba(243, 186, 47, 0.4));
 }
 
 .hero-section {
   text-align: center;
-  margin-bottom: 4rem;
-  margin-top: 4rem;
+  margin-bottom: 5rem;
+  margin-top: 5rem;
 }
 
 .hero-title {
-  font-size: 3.5rem;
+  font-family: var(--font-header);
+  font-size: 4rem;
+  font-weight: 800;
   margin-bottom: 1rem;
-  line-height: 1.3;
-  background: linear-gradient(180deg, #FFFFFF 0%, #94A3B8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  padding-bottom: 0.2rem;
-  /* Prevent descender cut-off */
+  line-height: 1.1;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  text-shadow: none;
 }
 
 .hero-subtitle {
@@ -104,7 +61,7 @@
   font-size: 1.25rem;
   max-width: 600px;
   margin: 0 auto;
-  font-weight: 400;
+  font-weight: 300;
   line-height: 1.6;
 }
 
@@ -122,34 +79,71 @@
   }
 }
 
-.mode-toggle {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  cursor: pointer;
-  font-family: var(--font-mono);
-  transition: all 0.2s ease;
-}
-
-.mode-toggle:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-primary);
-  border-color: var(--border-highlight);
-}
-
 .user-badge {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-size: 0.9rem;
   color: var(--text-secondary);
-  padding: 0.5rem 0.75rem;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.03);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-color);
+}
+
+.nav-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-family: var(--font-header);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: none;
+}
+
+.nav-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+  transform: none;
+}
+
+.nav-btn.active {
+  background: rgba(243, 186, 47, 0.1);
+  color: var(--accent-gold);
+  border-color: rgba(243, 186, 47, 0.2);
+  box-shadow: 0 0 15px rgba(243, 186, 47, 0.1);
+  transform: none;
+}
+
+.btn-verify {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: var(--accent-success);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-header);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  box-shadow: none;
+}
+
+.btn-verify:hover {
+  background: rgba(16, 185, 129, 0.2);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+  transform: none;
 }
 
 @media (max-width: 768px) {
@@ -166,87 +160,6 @@
     gap: 0.5rem !important;
   }
 
-  .nav-btn span {
-    display: none;
-  }
-
-  .user-badge span {
-    display: none;
-  }
-}
-
-.nav-btn {
-  background: #ffffff;
-  border: var(--border-width) solid var(--border-color);
-  color: var(--text-primary);
-  padding: 0.5rem 1rem;
-  border-radius: 0;
-  font-family: var(--font-header);
-  font-size: 0.7rem;
-  font-weight: 400;
-  cursor: pointer;
-  transition: all 0.1s;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  box-shadow: 2px 2px 0px #000;
-}
-
-.nav-btn:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0px #000;
-  background: #f0f0f0;
-  color: var(--text-primary);
-}
-
-.nav-btn.active {
-  background: var(--accent-secondary);
-  color: #000;
-  box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.2);
-  transform: translate(2px, 2px);
-}
-
-.btn-verify {
-  background: var(--success);
-  border: var(--border-width) solid var(--border-color);
-  color: #000;
-  padding: 0.5rem 1rem;
-  border-radius: 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-family: var(--font-header);
-  font-size: 0.7rem;
-  font-weight: 400;
-  transition: all 0.1s;
-  box-shadow: 2px 2px 0px #000;
-}
-
-.btn-verify:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0px #000;
-  background: #00ff66;
-}
-
-@media (max-width: 768px) {
-  .main-header {
-    flex-direction: column;
-    gap: 0.75rem;
-    padding: 0.75rem 0.5rem;
-    width: 100%;
-    overflow-x: hidden;
-  }
-
-  .header-controls {
-    width: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.5rem !important;
-    padding: 0 0.25rem;
-  }
-
   .nav-btn span,
   .btn-verify span,
   .user-badge span {
@@ -259,5 +172,9 @@
     padding: 0.6rem;
     justify-content: center;
     flex-shrink: 0;
+  }
+
+  .hero-title {
+    font-size: 2.5rem;
   }
 }

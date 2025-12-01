@@ -1,10 +1,13 @@
 import { useState } from 'react'
 import { supabase } from '../supabaseClient'
-import { Activity, ShieldCheck } from 'lucide-react'
+import { Activity, ShieldCheck, Mail } from 'lucide-react'
 
 export default function AuthModal({ isOpen, onClose }) {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
+    const [email, setEmail] = useState('')
+    const [showEmailInput, setShowEmailInput] = useState(false)
+    const [message, setMessage] = useState(null)
 
     if (!isOpen) return null
 
@@ -25,30 +28,59 @@ export default function AuthModal({ isOpen, onClose }) {
         }
     }
 
+    const handleEmailLogin = async (e) => {
+        e.preventDefault()
+        setLoading(true)
+        setError(null)
+        setMessage(null)
+        try {
+            const { error } = await supabase.auth.signInWithOtp({
+                email: email,
+                options: {
+                    emailRedirectTo: window.location.origin,
+                },
+            })
+            if (error) throw error
+            setMessage('Check your email for the login link!')
+        } catch (err) {
+            setError(err.message)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return (
-        <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.85)',
-            backdropFilter: 'blur(8px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 9999
-        }}>
-            <div style={{
-                background: '#1a1b1e',
-                border: '1px solid #333',
-                borderRadius: '16px',
-                padding: '2rem',
-                width: '100%',
-                maxWidth: '400px',
-                textAlign: 'center',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
-            }}>
+        <div
+            onClick={onClose}
+            style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                backdropFilter: 'blur(8px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 9999,
+                cursor: 'pointer'
+            }}
+        >
+            <div
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                    background: '#1a1b1e',
+                    border: '1px solid #333',
+                    borderRadius: '16px',
+                    padding: '2rem',
+                    width: '100%',
+                    maxWidth: '400px',
+                    textAlign: 'center',
+                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+                    cursor: 'default'
+                }}
+            >
                 <div style={{ marginBottom: '1.5rem' }}>
                     <div style={{
                         background: 'rgba(0, 240, 255, 0.1)',
@@ -81,6 +113,19 @@ export default function AuthModal({ isOpen, onClose }) {
                     </div>
                 )}
 
+                {message && (
+                    <div style={{
+                        background: 'rgba(0, 255, 100, 0.1)',
+                        color: '#4ade80',
+                        padding: '0.75rem',
+                        borderRadius: '8px',
+                        fontSize: '0.85rem',
+                        marginBottom: '1rem'
+                    }}>
+                        {message}
+                    </div>
+                )}
+
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     <button
                         onClick={() => handleLogin('google')}
@@ -106,28 +151,79 @@ export default function AuthModal({ isOpen, onClose }) {
                         Continue with Google
                     </button>
 
-                    <button
-                        onClick={() => handleLogin('discord')}
-                        disabled={loading}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '0.75rem',
-                            background: '#5865F2',
-                            color: '#fff',
-                            border: 'none',
-                            padding: '0.875rem',
-                            borderRadius: '8px',
-                            fontSize: '1rem',
-                            fontWeight: '600',
-                            cursor: loading ? 'wait' : 'pointer',
-                            opacity: loading ? 0.7 : 1
-                        }}
-                    >
-                        <img src="https://www.svgrepo.com/show/353655/discord-icon.svg" width="24" alt="Discord" style={{ filter: 'brightness(0) invert(1)' }} />
-                        Continue with Discord
-                    </button>
+                    {!showEmailInput ? (
+                        <button
+                            onClick={() => setShowEmailInput(true)}
+                            disabled={loading}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '0.75rem',
+                                background: '#333',
+                                color: '#fff',
+                                border: '1px solid #444',
+                                padding: '0.875rem',
+                                borderRadius: '8px',
+                                fontSize: '1rem',
+                                fontWeight: '600',
+                                cursor: loading ? 'wait' : 'pointer',
+                                opacity: loading ? 0.7 : 1
+                            }}
+                        >
+                            <Mail size={20} />
+                            Continue with Email
+                        </button>
+                    ) : (
+                        <form onSubmit={handleEmailLogin} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <input
+                                type="email"
+                                placeholder="Enter your email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                style={{
+                                    background: '#222',
+                                    border: '1px solid #444',
+                                    color: '#fff',
+                                    padding: '0.75rem',
+                                    borderRadius: '8px',
+                                    fontSize: '1rem',
+                                    outline: 'none'
+                                }}
+                            />
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                style={{
+                                    background: '#00f0ff',
+                                    color: '#000',
+                                    border: 'none',
+                                    padding: '0.75rem',
+                                    borderRadius: '8px',
+                                    fontSize: '1rem',
+                                    fontWeight: '600',
+                                    cursor: loading ? 'wait' : 'pointer'
+                                }}
+                            >
+                                {loading ? 'Sending...' : 'Send Magic Link'}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setShowEmailInput(false)}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: '#666',
+                                    fontSize: '0.8rem',
+                                    cursor: 'pointer',
+                                    marginTop: '0.25rem'
+                                }}
+                            >
+                                Cancel
+                            </button>
+                        </form>
+                    )}
                 </div>
 
                 <p style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: '#555', lineHeight: '1.4' }}>

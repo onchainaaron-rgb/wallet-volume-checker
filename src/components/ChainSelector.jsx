@@ -2,18 +2,18 @@ import { useState, useEffect } from 'react'
 import './ChainSelector.css'
 
 const AVAILABLE_CHAINS = [
-    { id: 'ethereum', name: 'Ethereum', color: '#627EEA' },
-    { id: 'base', name: 'Base', color: '#0052FF' },
-    { id: 'arbitrum', name: 'Arbitrum', color: '#2D374B' },
-    { id: 'optimism', name: 'Optimism', color: '#FF0420' },
-    { id: 'bsc', name: 'BSC', color: '#F3BA2F' },
-    { id: 'polygon', name: 'Polygon', color: '#8247E5' },
-    { id: 'avalanche', name: 'Avalanche', color: '#E84142' },
-    { id: 'solana', name: 'Solana', color: '#14F195' },
-    { id: 'zora', name: 'Zora', color: '#000000' },
-    { id: 'scroll', name: 'Scroll', color: '#FFDB8C' },
-    { id: 'blast', name: 'Blast', color: '#FCFC03' },
-    { id: 'fantom', name: 'Fantom', color: '#1969FF' },
+    { id: 'ethereum', name: 'Ethereum', icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=026' },
+    { id: 'base', name: 'Base', icon: 'https://raw.githubusercontent.com/base-org/brand-kit/master/logo/symbol/Base_Symbol_Blue.svg' },
+    { id: 'arbitrum', name: 'Arbitrum', icon: 'https://cryptologos.cc/logos/arbitrum-arb-logo.svg?v=026' },
+    { id: 'optimism', name: 'Optimism', icon: 'https://cryptologos.cc/logos/optimism-ethereum-op-logo.svg?v=026' },
+    { id: 'bsc', name: 'BSC', icon: 'https://cryptologos.cc/logos/bnb-bnb-logo.svg?v=026' },
+    { id: 'polygon', name: 'Polygon', icon: 'https://cryptologos.cc/logos/polygon-matic-logo.svg?v=026' },
+    { id: 'avalanche', name: 'Avalanche', icon: 'https://cryptologos.cc/logos/avalanche-avax-logo.svg?v=026' },
+    { id: 'solana', name: 'Solana', icon: 'https://cryptologos.cc/logos/solana-sol-logo.svg?v=026' },
+    { id: 'zora', name: 'Zora', icon: 'https://zora.co/favicon.ico' }, // Fallback for Zora
+    { id: 'scroll', name: 'Scroll', icon: 'https://scroll.io/logo.png' }, // Fallback for Scroll
+    { id: 'blast', name: 'Blast', icon: 'https://docs.blast.io/img/logo.svg' },
+    { id: 'fantom', name: 'Fantom', icon: 'https://cryptologos.cc/logos/fantom-ftm-logo.svg?v=026' },
 ]
 
 const ChainSelector = ({ onChainsChange }) => {
@@ -56,9 +56,13 @@ const ChainSelector = ({ onChainsChange }) => {
                         key={chain.id}
                         className={`chain-card ${selectedChains.includes(chain.id) ? 'active' : ''}`}
                         onClick={() => toggleChain(chain.id)}
-                        style={{ '--chain-color': chain.color }}
                     >
-                        <div className="chain-indicator"></div>
+                        <img
+                            src={chain.icon}
+                            alt={chain.name}
+                            className="chain-icon"
+                            style={{ width: '24px', height: '24px', borderRadius: '50%' }}
+                        />
                         <span className="chain-name">{chain.name}</span>
                     </div>
                 ))}

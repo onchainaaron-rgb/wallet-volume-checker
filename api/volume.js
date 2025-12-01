@@ -45,12 +45,13 @@ export default async function handler(req, res) {
         let totalVolume = 0;
         let txCount = 0;
 
-        log(`Starting Deep Scan: Chain ${chain}, Address ${address}`);
+        log(`Starting Universal Deep Scan: Chain ${chain}, Address ${address}`);
 
+        // PHASE 1: Transfers V2 (Tokens + Native)
         while (hasMore && pageNumber < MAX_PAGES) {
             // TIME CHECK
             if (Date.now() - START_TIME > TIME_LIMIT) {
-                log(`Time Limit Reached (${Date.now() - START_TIME}ms). Stopping scan at page ${pageNumber}.`);
+                log(`Time Limit Reached (${Date.now() - START_TIME}ms). Stopping Phase 1 at page ${pageNumber}.`);
                 break;
             }
 
@@ -63,14 +64,14 @@ export default async function handler(req, res) {
                 url = `${BASE_URL}/${chain}/address/${address}/transfers_v2/?key=${API_KEY}&page-number=${pageNumber}&page-size=100&quote-currency=USD`;
             }
 
-            log(`Fetching Page ${pageNumber}...`);
+            log(`[Phase 1] Fetching Page ${pageNumber}...`);
 
             try {
                 const response = await axios.get(url, AXIOS_CONFIG);
                 const items = response.data.data.items;
 
                 if (!items || items.length === 0) {
-                    log(`Page ${pageNumber} empty. Stopping.`);
+                    log(`[Phase 1] Page ${pageNumber} empty. Stopping.`);
                     hasMore = false;
                     break;
                 }
@@ -88,7 +89,7 @@ export default async function handler(req, res) {
                     }
                 }, 0);
 
-                log(`Page ${pageNumber} Vol: $${pageVolume.toFixed(2)}`);
+                log(`[Phase 1] Page ${pageNumber} Vol: $${pageVolume.toFixed(2)}`);
                 totalVolume += pageVolume;
                 txCount += items.length;
 
@@ -99,37 +100,37 @@ export default async function handler(req, res) {
                 }
             } catch (err) {
                 if (err.code === 'ECONNABORTED') {
-                    log(`Timeout fetching page ${pageNumber}`);
+                    log(`[Phase 1] Timeout fetching page ${pageNumber}`);
                     hasMore = false;
                     break;
                 }
                 if (err.response && [400, 410, 501].includes(err.response.status)) {
-                    log(`API Error ${err.response.status} on page ${pageNumber}`);
+                    log(`[Phase 1] API Error ${err.response.status} on page ${pageNumber}`);
                     hasMore = false;
                     break;
                 }
-                log(`Unknown Error on page ${pageNumber}: ${err.message}`);
-                // Don't throw, just return what we have
+                log(`[Phase 1] Unknown Error on page ${pageNumber}: ${err.message}`);
                 hasMore = false;
             }
         }
 
-        // FALLBACK LOGIC (Only if we have time left)
+        // PHASE 2: Universal Fallback (Transactions V3)
+        // Run this for ALL EVM chains if we have time left, to catch missing native volume
         let isSolana = chain === '1399811149';
-        let isBSC = chain === '56';
         let timeLeft = TIME_LIMIT - (Date.now() - START_TIME);
 
-        // Aggressive Fallback for BSC or extremely low volume chains
-        // If BSC volume is suspiciously low (<$1000) OR we just want to be sure, check transactions_v3
-        if ((totalVolume < 1000 || isBSC) && !isSolana && timeLeft > 1000) {
-            log(`Checking Fallback (transactions_v3) for ${chain}. Time left: ${timeLeft}ms`);
+        if (!isSolana && timeLeft > 1000) {
+            log(`[Phase 2] Starting Universal Fallback Check. Time left: ${timeLeft}ms`);
 
             let fallbackVolume = 0;
             hasMore = true;
             pageNumber = 0;
 
-            while (hasMore && pageNumber < 5) { // Limit fallback depth to save time
-                if (Date.now() - START_TIME > TIME_LIMIT) break;
+            while (hasMore && pageNumber < 10) { // Limit fallback to 10 pages (1000 txs) to be quick
+                if (Date.now() - START_TIME > TIME_LIMIT) {
+                    log(`[Phase 2] Time Limit Reached. Stopping.`);
+                    break;
+                }
 
                 let url = `${BASE_URL}/${chain}/address/${address}/transactions_v3/?key=${API_KEY}&page-number=${pageNumber}&page-size=100&quote-currency=USD`;
 
@@ -147,6 +148,7 @@ export default async function handler(req, res) {
                     }, 0);
 
                     fallbackVolume += pageVolume;
+                    // log(`[Phase 2] Page ${pageNumber} Vol: $${pageVolume.toFixed(2)}`);
 
                     if (!response.data.data.pagination || !response.data.data.pagination.has_more) {
                         hasMore = false;
@@ -154,20 +156,20 @@ export default async function handler(req, res) {
                         pageNumber++;
                     }
                 } catch (err) {
-                    log(`Fallback failed: ${err.message}`);
+                    log(`[Phase 2] Failed: ${err.message}`);
                     hasMore = false;
                 }
             }
 
             if (fallbackVolume > totalVolume) {
-                log(`Fallback yielded higher volume: $${fallbackVolume.toFixed(2)} vs $${totalVolume.toFixed(2)}`);
+                log(`[Phase 2] FOUND MORE VOLUME! Updating from $${totalVolume.toFixed(2)} to $${fallbackVolume.toFixed(2)}`);
                 totalVolume = fallbackVolume;
             } else {
-                log(`Fallback yielded lower/equal volume: $${fallbackVolume.toFixed(2)}. Keeping original.`);
+                log(`[Phase 2] No extra volume found (Fallback: $${fallbackVolume.toFixed(2)} vs Original: $${totalVolume.toFixed(2)})`);
             }
         }
 
-        log(`Scan Complete. Total: $${totalVolume.toFixed(2)}`);
+        log(`Scan Complete. Final Total: $${totalVolume.toFixed(2)}`);
         res.json({ volume: totalVolume, txCount, debugLogs });
 
     } catch (error) {

@@ -1,28 +1,28 @@
 :root {
-  /* Retro Palette */
-  --bg-dark: #f0f0f0;
-  /* Light Grey/White for retro feel */
-  --bg-card: #ffffff;
-  --bg-card-hover: #fff9c4;
-  /* Light Yellow hover */
-  /* Red & Black / Dark Mode Palette */
-  --bg-primary: #000000;
+  /* Premium Dark Mode Palette */
+  --bg-primary: #050505;
+  /* Deep Black */
   --bg-secondary: #0a0a0a;
-  --bg-card: rgba(20, 20, 20, 0.95);
-  --bg-glass: rgba(20, 20, 20, 0.8);
+  /* Dark Grey */
+  --bg-card: #111111;
+  /* Card Background */
+  --bg-card-hover: #161616;
+  /* Card Hover */
+  --bg-input: #0f0f0f;
+  /* Input Background */
 
   --text-primary: #ffffff;
-  --text-secondary: #9ca3af;
+  --text-secondary: #a1a1aa;
+  /* Zinc-400 */
   --text-muted: #525252;
 
-  /* Accents - Bold Red */
+  /* Accents - Refined Red */
   --accent-primary: #DC2626;
-  /* Red-600 */
   --accent-secondary: #EF4444;
-  /* Red-500 */
-  --accent-glow: rgba(220, 38, 38, 0.5);
+  --accent-glow: rgba(220, 38, 38, 0.3);
 
-  --border-color: #333333;
+  --border-color: #27272a;
+  /* Zinc-800 */
   --border-focus: #DC2626;
 
   --success: #10b981;
@@ -35,8 +35,8 @@
 
   /* Spacing & Layout */
   --max-width: 1200px;
-  --header-height: 80px;
-  --border-radius: 12px;
+  --header-height: 70px;
+  --border-radius: 8px;
 }
 
 body {
@@ -148,21 +148,22 @@ body {
 }
 
 .input-field {
-  background: #ffffff;
-  border: var(--border-width) solid var(--border-color);
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
   color: var(--text-primary);
   padding: 0.75rem 1rem;
-  border-radius: 0;
+  border-radius: var(--border-radius);
   width: 100%;
   font-family: var(--font-mono);
-  font-size: 1.2rem;
-  box-shadow: inset 4px 4px 0px rgba(0, 0, 0, 0.1);
+  font-size: 1rem;
+  transition: all 0.2s ease;
 }
 
 .input-field:focus {
   outline: none;
-  background: #fff;
-  box-shadow: inset 4px 4px 0px rgba(0, 0, 0, 0.2);
+  background: var(--bg-card-hover);
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1);
 }
 
 h1,
